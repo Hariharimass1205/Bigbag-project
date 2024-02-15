@@ -1,0 +1,2 @@
+//isblock session handle 
+
