@@ -6,8 +6,10 @@ const mongoose = require("mongoose")
 app.use(express.static(path.join(__dirname,"Public")))
 const userRouter = require("./Router/userRouter.js")
 const adminRouter = require("./Router/adminRouter.js")
-app.set("view engine","ejs")
 
+
+app.set("view engine","ejs")
+ 
 
 // to read info through req in json format
 app.use(express.json());
