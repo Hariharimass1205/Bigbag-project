@@ -1,9 +1,31 @@
 const express = require("express")
 const userRouter = express.Router()
-
+const {isUser} = require("../middleware/userloginmiddleware.js")
 
 //import from userController
-const { landingPagefn,allordersfn,singleorderfn,userProfilefn,userAddressfn, loginPagefn,forgetpage1fn,forgetpage4fn,productCategoryfn,forgetpage2fn,forgetpage3fn,insertUser,cartpagefn, signupPagefn, sign2login, Existemailfn, logoutfn, optVerify, logincheckfn } = require("../controllers/userController.js")
+const { 
+    landingPagefn,
+    allordersfn,
+    singleorderfn,
+    userProfilefn,
+    userAddressfn,
+    loginPagefn,
+    forgetpage1fn,
+    forgetpage4fn,
+    productCategoryfn,
+    forgetpage2fn,
+    forgetpage3fn,
+    insertUser,
+    cartpagefn,
+    signupPagefn,
+    sign2login,
+    Existemailfn,
+    logoutfn,
+    optVerify,
+    logincheckfn,
+    addAddressfn,
+    saveaddressfn,
+} = require("../controllers/userController.js")
 
 
 //login process
@@ -22,8 +44,10 @@ userRouter.post("/otp", optVerify)
 
 
 //paging process
-userRouter.get("/profile",userProfilefn)
+userRouter.get("/profile",isUser,userProfilefn)
 userRouter.get("/address",userAddressfn)
+userRouter.get("/addressAdd",addAddressfn)
+userRouter.post('/saveAddress',saveaddressfn)
 userRouter.get("/orders",allordersfn)
 userRouter.get("/singleorder",singleorderfn)
 userRouter.get("/cart",cartpagefn)

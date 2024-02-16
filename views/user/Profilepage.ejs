@@ -93,6 +93,7 @@
             <div class="col-12">
               <div class="btn-group me-0" role="group" aria-label="...">
                 <a href="javascript:void(0)" class="btn btn-default active"><i class="fa fa-user" aria-hidden="true"></i>Profile</a>
+                <a class='btn btn-default' href='/addressAdd'><i class="fas fa-map-marker-alt" aria-hidden="true"></i>Add Address</a>
                 <a class='btn btn-default' href='/address'><i class="fas fa-map-marker-alt" aria-hidden="true"></i>My Address</a>
                 <a class='btn btn-default' href='/orders'><i class="fa fa-list" aria-hidden="true"></i>All Orders</a>
                 <a class='btn btn-default' href='account-wishlist.html'><i class="fa fa-gift" aria-hidden="true"></i>Wishlist</a>
@@ -103,49 +104,37 @@
             <div class="col-md-12">
               <div class="innerWrapper profile">
                 <div class="row">
-                  
+                  <% if(userInfo) {%>
                   <div class="col-md-8 col-lg-9 col-xl-10 col-12">
                       <form class="form-horizontal">
                         <div class="form-group row">
                           <label for="" class="col-md-3 control-label">First Name</label>
                           <div class="col-md-7">
-                            <input type="text" class="form-control" placeholder="Adam" required>
+                            <h3  > <%= userInfo.fname %></h3> 
                           </div>
                         </div>
                         <div class="form-group row">
                           <label for="" class="col-md-3 control-label">Last Name</label>
-                          <div class="col-md-7">
-                            <input type="text" class="form-control" placeholder="Smith">
-                          </div>
-                        </div>
-                        <div class="form-group row">
-                          <label for="" class="col-md-3 control-label">Phone Number</label>
-                          <div class="col-md-9">
-                            <input type="text" class="form-control" placeholder="+884 5452 6432">
+                          <div class="col-md-7" >
+                            <h3> <%= userInfo.lname %></h3>
                           </div>
                         </div>
                         <div class="form-group row">
                           <label for="" class="col-md-3 control-label">Email Address</label>
                           <div class="col-md-9">
-                            <input type="email" class="form-control" placeholder="adamsmith@bigbag.com">
+                            <h3> <%= userInfo.email %></h3>
                           </div>
                         </div>
                         <div class="form-group row">
                           <label for="" class="col-md-3 control-label">Password</label>
-                          <div class="col-md-9">
-                            <input type="password" class="form-control" placeholder="***********">
+                          <div class="col-md-9" >
+                            <h3 value="**********" > *********** </h3>
                           </div>
                         </div>
+
+                        <% } %>
                         <div class="form-group row">
-                          <label for="" class="col-md-3 control-label">New Password</label>
-                          <div class="col-md-9">
-                            <input type="password" class="form-control" placeholder="***********">
-                          </div>
-                        </div>
-                        <div class="form-group row">
-                          <div class=" col-md-12 ">
-                            <button type="submit" class="btn btn-primary float-end">SAVE INFO</button>
-                          </div>
+                          
                         </div>
                       </form>
                   </div>

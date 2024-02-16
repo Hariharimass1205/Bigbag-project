@@ -4,6 +4,7 @@ const nodemailer = require("nodemailer")
 
 const productCollection = require("../Model/productModel.js");
 const categoryCollection = require("../Model/categoryModel.js");
+const addressModel = require("../Model/addressModel.js");
 
 const landingPagefn =(req,res) =>{
   req.session.userInfo
@@ -15,10 +16,12 @@ const logincheckfn = async (req,res)=>{
      const Email = req.body.Email
      const Password = req.body.Password
      const userCheck = await userModel.findOne({email:Email, isBlocked: false })
+
      if (userCheck){
        const passCheck = await bcrypt.compare(Password,userCheck.Password)
        if(passCheck){
         req.session.userInfo = userCheck.fname + userCheck.lname
+        req.session.userInfo2 = userCheck;
         res.redirect("/") 
        }else{
         req.session.userInvalid = true
@@ -143,7 +146,11 @@ const forgetpage3fn = (req,res)=>{
       })
       res.redirect("/login")
   }
-  //render into otp function
+
+
+
+
+  //render into otp function for signup
 const insertUser = async (req, res) => {
   const email = req.session.forgetEmail;
   console.log(req.session.forgetEmail)
@@ -243,11 +250,31 @@ const productCategoryfn = async (req, res) => {
 };
   
 const userProfilefn = (req,res)=>{
-  res.render("user/Profilepage")
+  const userInfo = req.session.userInfo2
+  res.render("user/Profilepage",{userInfo})
 }
 
-const userAddressfn = (req,res)=>{
+const userAddressfn = async (req,res)=>{
+   const address = await addressModel.find()
   res.render("user/addresspage")
+}
+const addAddressfn = (req,res)=>{
+res.render("user/ADDaddress")
+}
+const saveaddressfn= async (req,res)=>{
+  const userAddress = {
+    name : req.body.name,
+    mobile: req.body.mobile,
+    village: req.body.village,
+    landmark: req.body.landmark,
+    housenumber:req.body.housenumber,
+    city: req.body.city,
+    pincode : req.body.pincode,
+  }
+  const newAddress = await addressModel.insertMany([userAddress])
+  console.log(newAddress);
+   req.session.address = newAddress
+   res.redirect('/address')
 }
 const allordersfn = (req,res)=>{
 res.render("user/orders")
@@ -278,4 +305,7 @@ module.exports={logincheckfn,
   signupPagefn,
   Existemailfn,
   optVerify,
-  productCategoryfn}
+  addAddressfn,
+  saveaddressfn,
+  productCategoryfn,
+}
