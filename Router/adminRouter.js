@@ -52,6 +52,7 @@ adminRoute.post('/addproduct',upload.any(), productController.addProduct);
 adminRoute.get('/productEdit/:id', isAdmin,productController.editProductpage);
 adminRoute.post('/editProduct/:id',isAdmin,upload.any(), productController.editProduct)
 
+adminRoute.get('/deleteProduct/:id',isAdmin,productController.deleteProduct)
 
 adminRoute.post('/unlist/:id',isAdmin, productController.unListProduct)
 adminRoute.post('/list/:id',isAdmin, productController.listProduct)

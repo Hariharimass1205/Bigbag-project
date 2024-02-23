@@ -10,3 +10,4 @@ if (req.session.userInfo){
 }
 
 module.exports = {isUser}
+

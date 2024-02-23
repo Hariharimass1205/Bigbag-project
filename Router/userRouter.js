@@ -25,8 +25,14 @@ const {
     logincheckfn,
     addAddressfn,
     saveaddressfn,
+    editAddressfn,
+    postEditAddressfn,
+    deleteAddressfn,
+    categoryFilterfn,
+  
 } = require("../controllers/userController.js")
 
+//const {addCart}= require("../controllers/categoryController.js")
 
 //login process
 userRouter.get("/", landingPagefn)
@@ -43,11 +49,14 @@ userRouter.post("/resentotp",insertUser)
 userRouter.post("/otp", optVerify)
 
 
-//paging process
+//pageing process
 userRouter.get("/profile",isUser,userProfilefn)
 userRouter.get("/address",userAddressfn)
 userRouter.get("/addressAdd",addAddressfn)
 userRouter.post('/saveAddress',saveaddressfn)
+userRouter.get('/editAddress/:id',isUser,editAddressfn)
+userRouter.post('/editAddress/:id', isUser,postEditAddressfn)
+userRouter.get('/deleteAddress/:id',isUser,deleteAddressfn)
 userRouter.get("/orders",allordersfn)
 userRouter.get("/singleorder",singleorderfn)
 userRouter.get("/cart",cartpagefn)
@@ -63,7 +72,7 @@ userRouter.post("/resenOTP", optVerify)
 
 // product visibility process
 userRouter.get("/productCategory",productCategoryfn)
-
+userRouter.get("/filterCategory",categoryFilterfn)
 
 
 //Main userRouter connect with Main page for connection

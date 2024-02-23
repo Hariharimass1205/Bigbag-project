@@ -1,5 +1,4 @@
 const categoryCollection = require("../Model/categoryModel");
-const mongoose = require("mongoose");
 
 const categoriesPage = async (req, res) => {
     try {
@@ -100,4 +99,22 @@ const categoriesPage = async (req, res) => {
     }
   };
 
-  module.exports = {categoriesPage,addCategoriesPage,addCategory,editCategory,editCategoriesPage,deleteCategory,listCategory,unlistCategory}
+  module.exports = 
+  {
+    categoriesPage,
+    addCategoriesPage,
+    addCategory,
+    editCategory,
+    editCategoriesPage,
+    deleteCategory,
+    listCategory,
+    unlistCategory
+  }
+
+
+
+
+
+
+                               
+

@@ -29,7 +29,6 @@
             </div>
             <!-- begin sidebar scrollbar -->
             
-
             <div class="sidebar-footer">
               <div class="sidebar-footer-content bg-primary">
                 <ul class="d-flex">
@@ -81,7 +80,6 @@
           </div>
         </div>
       </section>
-
       <!-- MAIN CONTENT SECTION -->
       <section class="mainContent clearfix userProfile">
         <div class="container">
@@ -89,6 +87,7 @@
             <div class="col-md-12">
               <div class="btn-group me-0" role="group" aria-label="...">
                 <a class='btn btn-default' href='/profile'><i class="fa fa-user" aria-hidden="true"></i>Profile</a>
+                <a class='btn btn-default' href='/addressAdd'><i class="fas fa-map-marker-alt" aria-hidden="true"></i>Add Address</a>
                 <a href="javascript:void(0)" class="btn btn-default active"><i class="fas fa-map-marker-alt" aria-hidden="true"></i>My Address</a>
                 <a class='btn btn-default' href='/orders'><i class="fa fa-list" aria-hidden="true"></i>All Orders</a>
                 <a class='btn btn-default' href='account-wishlist.html'><i class="fa fa-gift" aria-hidden="true"></i>Wishlist</a>
@@ -101,32 +100,34 @@
                 <div class="orderBox myAddress mb-0 text-nowrap">
                   <div class="table-responsive">
                     <table class="table">
-                      <thead>
-                        <tr>
-                          <th>Company</th>
-                          <th>Name</th>
-                          <th>Address</th>
-                          <th>Country</th>
-                          <th class="">Phone</th>
-                          <th></th>
-                        </tr>
-                      </thead>
+                     
+                      <% addressData.forEach(function(address) { %>
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                            <div class="panel panel-default">
+                                
+                                <div class="panel-body">
+                                    <ul>
+                                        <li><span class="address-name"> <strong><%= address.name %> </strong></span></li>
+                                        <li><span>  <%= address.Phone %></span></li>
+                                        <li><span class="address-line2"><%= address.Address %></span></li>
+                                        <li><span class="address-line1"><%= address.State %></span></li>
+                                        <li><span class="address-line1"><%= address.City %></span></li>
+                                    </ul>
+                                </div>
+                                <div class="panel-footer panel-footer-address">
+                                    <a href="/editAddress/<%=address._id %>" class="btn btn-sm btn-success"> <i class="fa fa-edit"> </i> Edit </a>
+                                    <a class="btn btn-sm btn-danger"
+                                                                onclick="return confirm('Do you want to delete?')"
+                                                                href="/deleteAddress/<%= address._id %>">
+                                                                <i class="fa fa-minus-circle"></i> Delete
+                                                            </a>
+                                    <!-- <a class="btn btn-sm btn-danger" onclick="return deleteSwal('<%= address._id %>')" href="/account/deleteAddress/<%= address._id %>"> <i class="fa fa-minus-circle"></i> Delete </a> -->
+                                </div>
+                            </div>
+                        </div>
+                        <% }); %>
                       <tbody>
                         
-                        <tr class="alert alert-dismissible fade show p-0 mb-0" role="alert">
-                          <td>Nokia</td>
-                          <td>Adam Smith</td>
-                          <td>9/4 C Babor Road, Mohammad Pur, Dhaka</td>
-                          <td>Bangladesh</td>
-                          <td>+884 5452 6452</td>
-                          <td>
-                            <div class="btn-group" role="group">
-                              <button type="button" class="btn btn-default"><i class="fas fa-pencil-alt" aria-hidden="true"></i></button>
-                              <button type="button" data-bs-dismiss="alert" aria-label="Close" class="btn btn-default"><i class="fa fa-times" aria-hidden="true"></i></button>
-                            </div>
-                          </td>
-                        </tr>
-
                       </tbody>
                     </table>
                   </div>

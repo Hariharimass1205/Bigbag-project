@@ -2,14 +2,12 @@ const mongoose = require("mongoose")
 
 //create address schema (in which format data will go)
 const addressShcema = new mongoose.Schema({
+    userId: { type: mongoose.Types.ObjectId, ref:'userdbs' },
     name: String,
-    mobile: String,
-    village: String,
-    landmark: String,
-    Street : String,
-    housenumber:String,
-    city: String,
-    pincode : Number
+    Phone: Number,
+    Address: String,
+    State: String,
+    City : String,
 })
 // model is a communicator for DB and node.js
 const addressCollection = mongoose.model("address", addressShcema)

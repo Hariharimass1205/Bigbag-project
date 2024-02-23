@@ -5,14 +5,14 @@ const userdata = require("../Model/userModel");
 //requiring bcrypt
 const bcrypt = require("bcrypt");
 
-const securePassword = async (password) => {
-  try {
-    const passwordHash = await bcrypt.hash(password, 10);
-    return passwordHash;
-  } catch (error) {
-    console.log(error.message);s
-  }
-};
+// const securePassword = async (password) => {
+//   try {
+//     const passwordHash = await bcrypt.hash(password, 10);
+//     return passwordHash;
+//   } catch (error) {
+//     console.log(error.message);s
+//   }
+// };
 
 //admin login page
 const loadLogin = async (req, res) => {
@@ -31,20 +31,16 @@ const loadLogin = async (req, res) => {
   const verifyLogin = async (req, res) => {
     try {
       const { email, password } = req.body;
-  
       const userData = await userdata.findOne({ email });
       console.log('password:');
       console.log(password)
       console.log('userData:');
       console.log(userData)
       if (userData) {
-        
-        const passwordMatch = await bcrypt.compare(password, userData.Password);
-  
+        const passwordMatch = bcrypt.compare(password, userData.Password);
         if (passwordMatch) {
           req.session.user_id = userData._id;
           req.session.isLoggedin = true;
-  
           if (userData.is_admin === 0) {
             res.render("admin/login", {
               message: "Email and password incorrect",
@@ -63,7 +59,6 @@ const loadLogin = async (req, res) => {
       console.log(error.message);
     }
   };
-
   const adminHome = async (req, res) => {
     try {
       const userData = await userdata.findById({ _id: req.session.user_id });
@@ -72,7 +67,6 @@ const loadLogin = async (req, res) => {
       console.log(error.message);
     }
   };
-
   //logout function
 const adminLogout = async (req, res) => {
     try {
@@ -87,7 +81,6 @@ const adminLogout = async (req, res) => {
       console.log(error.message);
     }
   };
-  
   const userListController = async (req, res) => {
     try {
       if (req.session.isAdmin) {
@@ -130,6 +123,13 @@ const adminLogout = async (req, res) => {
       console.log(error);
     }
   };
-
-  module.exports = {loadLogin,verifyLogin,adminHome,adminLogout,userListController,unblockUserController,blockUserController}
+  module.exports = {
+    loadLogin,
+    verifyLogin,
+    adminHome,
+    adminLogout,
+    userListController,
+    unblockUserController,
+    blockUserController,
+  }
 

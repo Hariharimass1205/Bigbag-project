@@ -1,8 +1,6 @@
 const categoryCollection = require("../Model/categoryModel");
 const productCollection = require("../Model/productModel");
 
-
-
 const productlist= async (req, res) => {
     try {
         let page = Number(req.query.page) || 1;
@@ -16,7 +14,6 @@ const productlist= async (req, res) => {
           {},
           { categoryName: true }
         );
-    
         res.render("admin/productlist.ejs", {
           productData,
           categoryList,count,
@@ -28,7 +25,6 @@ const productlist= async (req, res) => {
         console.error(error);
       }
   };
-
   const addProductPage = async (req, res) => {
     try {
       const categories = await categoryCollection.find({ isListed:true});
@@ -43,7 +39,6 @@ const productlist= async (req, res) => {
     }
   };
   const addProduct = async (req, res) => {
-
     console.log(productCollection);
     try {
       let existingProduct = await productCollection.findOne({
@@ -51,7 +46,6 @@ const productlist= async (req, res) => {
          productName: req.body.productName,
       });
       if (!existingProduct) {
-
         console.log("in");
         await productCollection.insertMany([
           {
@@ -91,6 +85,18 @@ const productlist= async (req, res) => {
       console.error( error);
     }
   };
+
+const deleteProduct = async (req,res)=>{
+   try{
+      await productCollection.findOneAndDelete({ _id: req.params.id });
+      res.redirect("/admin/products");
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+
+
   const editProduct = async (req, res) => {
     console.log("edit");
     try {
@@ -120,7 +126,6 @@ const productlist= async (req, res) => {
         if (req.files[2]) {
           updateFields.$set.productImage3 = req.files[2].filename;
         }
-  
         await productCollection.findOneAndUpdate(
           { _id: req.params.id },
           updateFields
@@ -136,7 +141,6 @@ const productlist= async (req, res) => {
       console.error(error);
     }
   };
-
   const unListProduct = async (req, res) => {
     try {
       await productCollection.findOneAndUpdate(
@@ -159,5 +163,14 @@ const productlist= async (req, res) => {
       console.error(error);
     }
   };
- 
-  module.exports = {addProduct,addProductPage,productlist,editProductpage,editProduct,unListProduct,listProduct,}
+  module.exports = 
+  {
+    addProduct,
+    addProductPage,
+    productlist,
+    editProductpage,
+    editProduct,
+    unListProduct,
+    listProduct,
+    deleteProduct
+  }

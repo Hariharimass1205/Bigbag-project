@@ -4,10 +4,10 @@ const nodemailer = require("nodemailer")
 
 const productCollection = require("../Model/productModel.js");
 const categoryCollection = require("../Model/categoryModel.js");
-const addressModel = require("../Model/addressModel.js");
+const addressCollection = require("../Model/addressModel.js");
 
 const landingPagefn =(req,res) =>{
-  req.session.userInfo
+  req.session.userInfo  
   req.session.userinfosignin
   req.session.isBlocked = false
    res.render("user/landingpage",{userInfo : req.session.userInfo})
@@ -18,10 +18,11 @@ const logincheckfn = async (req,res)=>{
      const userCheck = await userModel.findOne({email:Email, isBlocked: false })
 
      if (userCheck){
-       const passCheck = await bcrypt.compare(Password,userCheck.Password)
+       const passCheck =  bcrypt.compare(Password,userCheck.Password)
        if(passCheck){
         req.session.userInfo = userCheck.fname + userCheck.lname
         req.session.userInfo2 = userCheck;
+        req.session.email = userCheck.email
         res.redirect("/") 
        }else{
         req.session.userInvalid = true
@@ -36,10 +37,11 @@ const logincheckfn = async (req,res)=>{
      }
 }
 const loginPagefn = (req,res)=>{
-  res.render("user/login",{userInvalid : req.session.userInvalid,isBlocked: req.session.isBlocked})
+  res.render("user/login",{userInvalid:req.session.userInvalid,isBlocked:req.session.isBlocked})
   req.session.userInvalid = false
   req.session.isBlocked = false
 } 
+
 const logoutfn =(req,res)=>{
   req.session.userInvalid = false
   req.session.userInfo = false
@@ -52,7 +54,7 @@ const sign2login = (req,res)=>{
 const signupPagefn = (req,res)=>{
   try{
     req.session.emailExist;
-    res.render("user/signup",{emailExist : req.session.emailExist})
+    res.render("user/signup",{emailExist:req.session.emailExist})
     req.session.emailExist = false
     req.session.save()
   }catch(err){
@@ -92,15 +94,18 @@ const Existemailfn = async (req, res) => {
   const optVerify = async (req,res)=>{
       const otp = req.session.otp
      if(otp === Number(req.body.otp)){
-       const userdetails = req.session.userDetail
+       const userdetails = req.session.userDetail 
        await userModel(userdetails).save()
        req.session.userInfo = userdetails.fname + userdetails.lname 
+       req.session.email = userdetails.email
        req.session.islogin = true
        res.redirect("/")
      }else{
-      res.render("user/otppage",{invalidotp : "OTP Invalid"})
+      res.render("user/otppage",{invalidotp:"OTP Invalid"})
      }
   }
+
+
   const forgetpage1fn = (req,res)=>{
     try {
       res.render("user/forgetpage1")
@@ -119,6 +124,8 @@ const Existemailfn = async (req, res) => {
     console.log(error)
   }
 }
+
+
 const forgetpage3fn = (req,res)=>{
   try {
      const otp = Number(req.body.resetotp)
@@ -134,6 +141,8 @@ const forgetpage3fn = (req,res)=>{
       console.log(error)
     }
   }
+
+
   const forgetpage4fn = async (req,res)=>{
     const newpass = req.body.NewPassword
     const email = req.session.forgetEmail
@@ -148,8 +157,6 @@ const forgetpage3fn = (req,res)=>{
   }
 
 
-
-
   //render into otp function for signup
 const insertUser = async (req, res) => {
   const email = req.session.forgetEmail;
@@ -158,6 +165,7 @@ const insertUser = async (req, res) => {
   req.session.otp1 = otp;
   res.render("user/otppage");
 };
+
 
  // callback fn for otp
 const emailOtp = async (email) => {
@@ -186,7 +194,11 @@ const emailOtp = async (email) => {
      console.log(`Error from emailOtp router ${err}`);
    }
  };
+ 
+ 
 
+
+ 
  const Passresetotp = async (email) => {
   try {
     const emailID = email;
@@ -214,10 +226,11 @@ const emailOtp = async (email) => {
 };
 
 
+
 const productCategoryfn = async (req, res) => {
   try {
     let page = Number(req.query.page) || 1;
-    let limit = 4;
+    let limit = 8;
     let skip = (page - 1) * limit;
 
     let categoryData = await categoryCollection.find({ isListed: true });
@@ -225,16 +238,20 @@ const productCategoryfn = async (req, res) => {
       .find({ isListed: true })
       .skip(skip)
       .limit(limit)
+      productData = await  req.session.categoriesFilter ? req.session.categoriesFilter : productData;
+
+      req.session.categoriesFilter = productData
+      req.session.save()
 
     let count = await productCollection.countDocuments({ isListed: true });
-
     let totalPages = Math.ceil(count / limit);
     let totalPagesArray = new Array(totalPages).fill(null);
-
+    let userInfo2 =  req.session.userInfo2;
+      console.log(userInfo2)
     res.render("user/productsCategory", {
       categoryData,
       productData,
-      currentUser: req.session.currentUser,
+      currentUser: req.session.userInfo2,
       user: req.session.user,
       count,
       limit,
@@ -242,40 +259,118 @@ const productCategoryfn = async (req, res) => {
       currentPage: page,
       selectedFilter: req.session.selectedFilter,
     });
-    console.log(req.session.currentUser);
   } catch (error) {   
     console.error("Error fetching product data:", error);
     res.status(500).send("Internal Server Error");
   }
 };
-  
+
+const categoryFilterfn = async (req,res)=>{
+  try{
+    if(req.query.categoriesName =="All"){
+      req.session.categoriesFilter = await productCollection.find({isListed:true})
+      req.session.count = (req.session.categoriesFilter).length 
+      req.session.save()
+      res.redirect("/productCategory")
+    }else{
+      req.session.categoriesFilter = await productCollection.find({isListed:true,parentCategory:req.query.categoriesName})
+      req.session.count = (req.session.categoriesFilter).length 
+      req.session.save()
+      res.redirect("/productCategory")
+    }
+  }catch(err){
+      console.log(`Error from categories filter page ${err}`)
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
 const userProfilefn = (req,res)=>{
   const userInfo = req.session.userInfo2
   res.render("user/Profilepage",{userInfo})
 }
 
+
+
 const userAddressfn = async (req,res)=>{
-   const address = await addressModel.find()
-  res.render("user/addresspage")
+   let userInfo2 = req.session.userInfo2
+   console.log(userInfo2)
+  const addressData = await addressCollection.find({
+    userId:req.session.userInfo2._id
+  });
+  console.log(addressData)
+  res.render("user/Addresspage", {
+    currentUser: req.session.userInfo2._id,
+    addressData
+  });
 }
+
 const addAddressfn = (req,res)=>{
-res.render("user/ADDaddress")
+res.render("user/ADDaddress",{
+currentUser: req.session.currentUser
+})
 }
+
 const saveaddressfn= async (req,res)=>{
+  const user = await userModel.findOne({email:req.session.email})
   const userAddress = {
+    userId : user._id,
     name : req.body.name,
-    mobile: req.body.mobile,
-    village: req.body.village,
-    landmark: req.body.landmark,
-    housenumber:req.body.housenumber,
-    city: req.body.city,
-    pincode : req.body.pincode,
+    Phone: req.body.Phone,
+    Address: req.body.Address,
+    State: req.body.State,
+    City:req.body.City,
   }
-  const newAddress = await addressModel.insertMany([userAddress])
+  const newAddress = await addressCollection.insertMany([userAddress])
   console.log(newAddress);
    req.session.address = newAddress
    res.redirect('/address')
 }
+
+const editAddressfn = async (req,res)=>{
+  req.session.userInfo2;
+  const existingAddress = await addressCollection.findOne({
+    _id: req.params.id,
+  });
+  res.render("user/editAddress",{existingAddress})
+}
+ 
+const postEditAddressfn = async (req,res)=>{
+  try {
+    const address = {
+      name: req.body.name,
+      Phone: req.body.Phone,
+      Address: req.body.Address,
+      State: req.body.State,
+      City: req.body.City,
+    };
+    await addressCollection.updateOne({ _id: req.params.id }, address);
+    res.redirect("/address");
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
+const deleteAddressfn =  async (req, res) => {
+  try {
+    await addressCollection.deleteOne({ _id: req.params.id });
+    res.redirect("/address");
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+
 const allordersfn = (req,res)=>{
 res.render("user/orders")
 }
@@ -286,8 +381,8 @@ const cartpagefn = (req,res)=>{
   res.render("user/cartpage")
 }
 
-
-module.exports={logincheckfn,
+module.exports={
+  logincheckfn,
   singleorderfn,
   cartpagefn,
   allordersfn,
@@ -308,4 +403,8 @@ module.exports={logincheckfn,
   addAddressfn,
   saveaddressfn,
   productCategoryfn,
+  editAddressfn,
+  postEditAddressfn,
+  deleteAddressfn,
+  categoryFilterfn,
 }
