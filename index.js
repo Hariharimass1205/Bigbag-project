@@ -22,7 +22,7 @@ app.use((req,res,next)=>{
 })
 
 //logger
-app.use(morgan("dev"));
+//app.use(morgan("dev"));
 
 //express-session middleware insertion
 app.set("trust proxy", 1); // trust first proxy

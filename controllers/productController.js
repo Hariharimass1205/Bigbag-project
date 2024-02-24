@@ -1,6 +1,13 @@
 const categoryCollection = require("../Model/categoryModel");
 const productCollection = require("../Model/productModel");
 
+
+
+//    admin product process fn below
+
+
+
+
 const productlist= async (req, res) => {
     try {
         let page = Number(req.query.page) || 1;
@@ -97,6 +104,91 @@ const deleteProduct = async (req,res)=>{
 
 
 
+  const unListProduct = async (req, res) => {
+    try {
+      await productCollection.findOneAndUpdate(
+        { _id: req.params.id },
+        { $set: { isListed: false } }
+      );
+      res.redirect("/admin/products");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
+  
+  const listProduct = async (req, res) => {
+    try {
+      await productCollection.findOneAndUpdate(
+        { _id: req.params.id },
+        { $set: { isListed: true } }
+      );
+      res.redirect("/admin/products");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
+
+
+  const sortPricefn = async(req,res)=>{
+    try{
+        if(req.params.id == "lowToHigh"){
+            let data = req.session.categoriesFilter
+            let i=0
+            let temp;
+            let j;
+             while(i<data.length)
+            {
+                j=i+1
+                while(j<data.length){
+                    if(data[i].productPrice>data[j].productPrice)
+                    {
+                        temp= data[i]
+                        data[i]=data[j]
+                        data[j]=temp
+                    }
+                    j++
+                }
+                i++
+            }
+            req.session.count = (req.session.categoriesFilter).length
+            req.session.save()
+            res.redirect("/productCategory")
+        }else if(req.params.id == "highToLow"){
+            let data = req.session.categoriesFilter
+            console.log(req.session.categoriesFilter)
+            let i=0
+            let temp;
+            let j;
+             while(i<data.length)
+            {
+                j=i+1
+                while(j<data.length){
+                    if(data[i].productPrice<data[j].productPrice)
+                    {
+                        temp= data[i]
+                        data[i]=data[j]
+                        data[j]=temp
+                    }
+                    j++
+                }
+                i++
+            }
+            req.session.categoriesFilter = data
+            req.session.count = data.length
+            req.session.save()
+            res.redirect("/productCategory")
+        }
+    }catch(err){
+        res.status(500).send({success:false})
+        console.log(`Error from sortPrice ${err}`)
+    }
+}
+
+
   const editProduct = async (req, res) => {
     console.log("edit");
     try {
@@ -141,28 +233,7 @@ const deleteProduct = async (req,res)=>{
       console.error(error);
     }
   };
-  const unListProduct = async (req, res) => {
-    try {
-      await productCollection.findOneAndUpdate(
-        { _id: req.params.id },
-        { $set: { isListed: false } }
-      );
-      res.redirect("/admin/products");
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  const listProduct = async (req, res) => {
-    try {
-      await productCollection.findOneAndUpdate(
-        { _id: req.params.id },
-        { $set: { isListed: true } }
-      );
-      res.redirect("/admin/products");
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  
   module.exports = 
   {
     addProduct,
@@ -172,5 +243,68 @@ const deleteProduct = async (req,res)=>{
     editProduct,
     unListProduct,
     listProduct,
-    deleteProduct
+    deleteProduct,
+    sortPricefn,
+    productCategoryfn,
+    ProductDetailsfn
   }
+
+
+
+
+
+  // //    user product process fn below
+
+
+  const productCategoryfn = async (req, res) => {
+    req.session.userInfo
+    req.session.userInfo1
+    try {
+      let page = Number(req.query.page) || 1;
+      let limit = 8;
+      let skip = (page - 1) * limit;
+  
+      let categoryData = await categoryCollection.find({ isListed: true });
+      let productData = await productCollection
+        .find({ isListed: true })
+        .skip(skip)
+        .limit(limit)
+        productData = await  req.session.categoriesFilter ? req.session.categoriesFilter : productData;
+  
+        req.session.categoriesFilter = productData
+        req.session.save()
+  
+      let count = await productCollection.countDocuments({ isListed: true });
+      let totalPages = Math.ceil(count / limit);
+      let totalPagesArray = new Array(totalPages).fill(null);
+      let userInfo2 =  req.session.userInfo2;
+      res.render("user/productsCategory", {
+        categoryData,
+        productData,
+        currentUser: req.session.userInfo2,
+        user: req.session.user,
+        count,
+        limit,
+        totalPagesArray,
+        currentPage: page,
+        selectedFilter: req.session.selectedFilter,
+      });
+    } catch (error) {   
+      console.error("Error fetching product data:", error);
+      res.status(500).send("Internal Server Error");
+    }
+  };
+
+
+  const ProductDetailsfn = async (req, res) => {
+    try {
+      const currentProduct = await productCollection.findOne({
+        _id: req.params.id,
+      });
+      res.render("user/productDetails", {
+        user: req.session.user,
+        currentProduct,
+      });
+      console.log(currentProduct);
+    } catch (error) { }
+  };

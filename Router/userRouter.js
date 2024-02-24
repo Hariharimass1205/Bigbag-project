@@ -2,34 +2,52 @@ const express = require("express")
 const userRouter = express.Router()
 const {isUser} = require("../middleware/userloginmiddleware.js")
 
+
+
+const {
+    cartpagefn,
+}= require("../controllers/cartController.js")
+
+const {
+    categoryFilterfn,
+}=require("../controllers/categoryController.js")
+
+
+const {
+    sortPricefn,
+    productCategoryfn,
+    ProductDetailsfn
+       }= require("../controllers/productController.js")
+
+
+const { 
+    userAddressfn,
+    addAddressfn,
+    saveaddressfn,
+    editAddressfn,
+    postEditAddressfn,
+    deleteAddressfn,
+      }= require("../controllers/addressController.js")
+
+
 //import from userController
 const { 
     landingPagefn,
     allordersfn,
     singleorderfn,
     userProfilefn,
-    userAddressfn,
     loginPagefn,
     forgetpage1fn,
     forgetpage4fn,
-    productCategoryfn,
     forgetpage2fn,
     forgetpage3fn,
     insertUser,
-    cartpagefn,
     signupPagefn,
     sign2login,
     Existemailfn,
     logoutfn,
     optVerify,
     logincheckfn,
-    addAddressfn,
-    saveaddressfn,
-    editAddressfn,
-    postEditAddressfn,
-    deleteAddressfn,
-    categoryFilterfn,
-  
 } = require("../controllers/userController.js")
 
 //const {addCart}= require("../controllers/categoryController.js")
@@ -51,15 +69,14 @@ userRouter.post("/otp", optVerify)
 
 //pageing process
 userRouter.get("/profile",isUser,userProfilefn)
-userRouter.get("/address",userAddressfn)
-userRouter.get("/addressAdd",addAddressfn)
+userRouter.get("/address",isUser,userAddressfn)
+userRouter.get("/addressAdd",isUser,addAddressfn)
 userRouter.post('/saveAddress',saveaddressfn)
 userRouter.get('/editAddress/:id',isUser,editAddressfn)
 userRouter.post('/editAddress/:id', isUser,postEditAddressfn)
 userRouter.get('/deleteAddress/:id',isUser,deleteAddressfn)
-userRouter.get("/orders",allordersfn)
+userRouter.get("/orders",isUser,allordersfn)
 userRouter.get("/singleorder",singleorderfn)
-userRouter.get("/cart",cartpagefn)
 
 
 //forget password process
@@ -71,8 +88,13 @@ userRouter.post("/resenOTP", optVerify)
 
 
 // product visibility process
-userRouter.get("/productCategory",productCategoryfn)
+userRouter.get("/productCategory", isUser,productCategoryfn)
 userRouter.get("/filterCategory",categoryFilterfn)
+userRouter.get("/sortLow/:id",sortPricefn)
+userRouter.get("/productDetails/:id",ProductDetailsfn)
+
+// cart
+userRouter.get("/cart/:id",cartpagefn)
 
 
 //Main userRouter connect with Main page for connection

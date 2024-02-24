@@ -104,11 +104,11 @@
                         <div class="panel-body">
                           <ul class="list-unstyled clearfix">
                             <li><a href="javascript:void(0)"></a></li>
-                            <li><a href="javascript:void(0)">low-High</a></li>
+                            <li><a href="/sortLow/lowToHigh">low-High</a></li>
                             <li><a href="javascript:void(0)"></a></li>
                   
                             <li><a href="javascript:void(0)"></a></li>
-                            <li><a href="javascript:void(0)">High-Low</a></li>
+                            <li><a href="/sortLow/highToLow">High-Low</a></li>
                             <li><a href="javascript:void(0)"></a></li>
                           </ul>
                         </div>
@@ -124,7 +124,7 @@
             gap:10px;" >
           <% productData.forEach((product, i)=> { %>
                 <div class="item" >
-                    <a  href="/productDetails/<%= product._id %>"><img data-src="/upload/<%= product.productImage1 %>" src="/upload/<%= product.productImage1 %>" alt="image"   class="img-responsive" style="    width: 150px; padding-bottom: 10px;
+                    <a  href="/productDetails/<%= product._id %>"><img  data-src="/upload/<%= product.productImage1 %>" src="/upload/<%= product.productImage1 %>" alt="image"   class="img-responsive" style="    width: 150px; padding-bottom: 10px;
                     height: 200px; overflow: hidden;"></a>
                     <div style=" display: flex;
                     flex-direction: column;
@@ -133,15 +133,10 @@
                     align-items: center;">
                       <a href="/productDetails/<%= product._id %>"><h5 style="padding-bottom: 10px;"><%= product.productName %></h5></a>
                       <h4 style="padding-bottom: 10px;">$<%= product.productPrice %></h4>
-                      <a href="/cart/<%= product._id %>" onclick="addToCart()">
-                      <button style="width: 7em;
-                      padding: 5px 9px;
-                      background-color: black;
-                      color: white;">Add to Cart</button>
-                      </a>
                     </div>
                 </div>
                 <% }); %>
+                
                
             </div>
           </div>

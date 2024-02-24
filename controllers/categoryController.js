@@ -108,7 +108,27 @@ const categoriesPage = async (req, res) => {
     editCategoriesPage,
     deleteCategory,
     listCategory,
-    unlistCategory
+    unlistCategory,
+    categoryFilterfn
+  }
+
+
+  const categoryFilterfn = async (req,res)=>{
+    try{
+      if(req.query.categoriesName =="All"){
+        req.session.categoriesFilter = await productCollection.find({isListed:true})
+        req.session.count = (req.session.categoriesFilter).length 
+        req.session.save()
+        res.redirect("/productCategory")
+      }else{
+        req.session.categoriesFilter = await productCollection.find({isListed:true,parentCategory:req.query.categoriesName})
+        req.session.count = (req.session.categoriesFilter).length 
+        req.session.save()
+        res.redirect("/productCategory")
+      }
+    }catch(err){
+        console.log(`Error from categories filter page ${err}`)
+    }
   }
 
 
