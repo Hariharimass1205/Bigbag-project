@@ -245,9 +245,8 @@ const deleteProduct = async (req,res)=>{
     listProduct,
     deleteProduct,
     sortPricefn,
-    productCategoryfn,
-    ProductDetailsfn
-  }
+    
+  
 
 
 
@@ -256,7 +255,7 @@ const deleteProduct = async (req,res)=>{
   // //    user product process fn below
 
 
-  const productCategoryfn = async (req, res) => {
+   productCategoryfn :async (req, res) => {
     req.session.userInfo
     req.session.userInfo1
     try {
@@ -293,10 +292,11 @@ const deleteProduct = async (req,res)=>{
       console.error("Error fetching product data:", error);
       res.status(500).send("Internal Server Error");
     }
-  };
+  }
+,
 
 
-  const ProductDetailsfn = async (req, res) => {
+      ProductDetailsfn : async (req, res) => {
     try {
       const currentProduct = await productCollection.findOne({
         _id: req.params.id,
@@ -307,4 +307,5 @@ const deleteProduct = async (req,res)=>{
       });
       console.log(currentProduct);
     } catch (error) { }
-  };
+  },
+  }

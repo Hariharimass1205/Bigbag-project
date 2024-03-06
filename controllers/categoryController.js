@@ -1,4 +1,5 @@
 const categoryCollection = require("../Model/categoryModel");
+const productCollection = require("../Model/productModel")
 
 const categoriesPage = async (req, res) => {
     try {
@@ -99,19 +100,6 @@ const categoriesPage = async (req, res) => {
     }
   };
 
-  module.exports = 
-  {
-    categoriesPage,
-    addCategoriesPage,
-    addCategory,
-    editCategory,
-    editCategoriesPage,
-    deleteCategory,
-    listCategory,
-    unlistCategory,
-    categoryFilterfn
-  }
-
 
   const categoryFilterfn = async (req,res)=>{
     try{
@@ -130,6 +118,25 @@ const categoriesPage = async (req, res) => {
         console.log(`Error from categories filter page ${err}`)
     }
   }
+
+
+
+
+  module.exports = 
+  {
+    categoriesPage,
+    addCategoriesPage,
+    addCategory,
+    editCategory,
+    editCategoriesPage,
+    deleteCategory,
+    listCategory,
+    unlistCategory,
+    categoryFilterfn
+  }
+
+
+
 
 
 

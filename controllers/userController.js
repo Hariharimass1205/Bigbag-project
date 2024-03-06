@@ -262,5 +262,4 @@ module.exports={
   signupPagefn,
   Existemailfn,
   optVerify,
-  categoryFilterfn,
 }
