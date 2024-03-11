@@ -1,11 +1,17 @@
 const express = require("express")
 const userRouter = express.Router()
-const {isUser} = require("../middleware/userloginmiddleware.js")
+const {isUser,isBlocked} = require("../middleware/userloginmiddleware.js")
 
 
 
 const {
     cartpagefn,
+    addtoCart,
+    decQty,
+    incQty,
+    deleteFromCart,
+    getcheckoutpagefn,
+    orderPlacedEnd
 }= require("../controllers/cartController.js")
 
 const {
@@ -17,7 +23,7 @@ const {
     sortPricefn,
     productCategoryfn,
     ProductDetailsfn
-       }= require("../controllers/productController.js")
+}= require("../controllers/productController.js")
 
 
 const { 
@@ -27,14 +33,14 @@ const {
     editAddressfn,
     postEditAddressfn,
     deleteAddressfn,
-      }= require("../controllers/addressController.js")
+    PrimaryCheckfn,
+    notPrimaryCheckfn
+}= require("../controllers/addressController.js")
 
 
 //import from userController
 const { 
     landingPagefn,
-    allordersfn,
-    singleorderfn,
     userProfilefn,
     loginPagefn,
     forgetpage1fn,
@@ -44,13 +50,18 @@ const {
     insertUser,
     signupPagefn,
     sign2login,
-    Existemailfn,
+    signupfn,
     logoutfn,
     optVerify,
     logincheckfn,
 } = require("../controllers/userController.js")
 
-//const {addCart}= require("../controllers/categoryController.js")
+const {
+    allordersfn,
+    singleorderfn,
+    cancelOrder,
+    returnRequest,
+}= require("../controllers/orderController.js")
 
 //login process
 userRouter.get("/", landingPagefn)
@@ -61,42 +72,56 @@ userRouter.post("/logincheck", logincheckfn)
 
 
 // signup process
-userRouter.get("/signup", signupPagefn)
-userRouter.post("/userDetails", Existemailfn)
+userRouter.get("/signup",signupPagefn)
+userRouter.post("/userDetails",signupfn)
 userRouter.post("/resentotp",insertUser)
-userRouter.post("/otp", optVerify)
+userRouter.post("/otp",optVerify)
 
 
 //pageing process
-userRouter.get("/profile",isUser,userProfilefn)
-userRouter.get("/address",isUser,userAddressfn)
-userRouter.get("/addressAdd",isUser,addAddressfn)
-userRouter.post('/saveAddress',saveaddressfn)
-userRouter.get('/editAddress/:id',isUser,editAddressfn)
-userRouter.post('/editAddress/:id', isUser,postEditAddressfn)
-userRouter.get('/deleteAddress/:id',isUser,deleteAddressfn)
+userRouter.get("/profile",isUser,isBlocked,userProfilefn)
+userRouter.get("/address",isUser,isBlocked,userAddressfn)
+userRouter.get("/addressAdd",isUser,isBlocked,addAddressfn)
+userRouter.post('/saveAddress',isBlocked,saveaddressfn)
+userRouter.get('/editAddress/:id',isUser,isBlocked,editAddressfn)
+userRouter.post('/editAddress/:id',isBlocked, isUser,postEditAddressfn)
+userRouter.get('/deleteAddress/:id',isUser,isBlocked,deleteAddressfn)
+userRouter.get("/primary/:id",isBlocked,PrimaryCheckfn)
+userRouter.get("/notPrimary/:id",isBlocked,notPrimaryCheckfn)
 userRouter.get("/orders",isUser,allordersfn)
-userRouter.get("/singleorder",singleorderfn)
+userRouter.get("/orderStatus/:id",isBlocked,singleorderfn)
 
 
 //forget password process
-userRouter.get("/forget1",forgetpage1fn)
-userRouter.post("/forget2",forgetpage2fn)
-userRouter.post("/forget3",forgetpage3fn)
-userRouter.post("/forget4",forgetpage4fn)
-userRouter.post("/resenOTP", optVerify)
+userRouter.get("/forget1",isBlocked,forgetpage1fn)
+userRouter.post("/forget2",isBlocked,forgetpage2fn)
+userRouter.post("/forget3",isBlocked,forgetpage3fn)
+userRouter.post("/forget4",isBlocked,forgetpage4fn)
+userRouter.post("/resenOTP",isBlocked, optVerify)
 
 
 // product visibility process
-userRouter.get("/productCategory", isUser,productCategoryfn)
-userRouter.get("/filterCategory",categoryFilterfn)
-userRouter.get("/sortLow/:id",sortPricefn)
-userRouter.get("/productDetails/:id",ProductDetailsfn)
+userRouter.get("/productCategory", isBlocked,isUser,productCategoryfn)
+userRouter.get("/filterCategory",isBlocked,categoryFilterfn)
+userRouter.get("/sortLow/:id",isBlocked,sortPricefn)
+userRouter.get("/productDetails/:id",isBlocked,ProductDetailsfn)
 
 // cart
-userRouter.get("/cart/:id",cartpagefn)
+userRouter.get("/cart/:id",isBlocked,cartpagefn)
+userRouter.get("/cart",isBlocked,isUser,cartpagefn)
+userRouter.post("/addto-cart/:id",isBlocked,addtoCart);
+userRouter.put('/cart/decQty/:id',isBlocked,decQty)
+userRouter.put('/cart/incQty/:id',isBlocked,incQty)
+userRouter.delete('/cart/delete/:id',isBlocked,deleteFromCart);
+userRouter.get("/checkout",isBlocked,getcheckoutpagefn)
 
-
+userRouter.all('/confirmOrder',orderPlacedEnd)
+userRouter.put('/cancelOrder/:id',cancelOrder )
+userRouter.put('/returnorder/:id',returnRequest)
 //Main userRouter connect with Main page for connection
 module.exports = userRouter
+
+
+
+
 

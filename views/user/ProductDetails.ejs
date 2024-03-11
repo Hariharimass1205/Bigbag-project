@@ -162,33 +162,23 @@
                   <div class="row">
                    
 
+
                     <div class="col-12">
                       <div class="d-flex align-items-center mb-5 pt-3">
-                        <h5 class="me-4">Quantity:</h5>
                         <div class="SingleCartListInner cartListInner ps-1">
-                          <form action="#">
-                            <div class="table-responsive">
-                              <table class="table">
-                                <tbody>
-                                  <tr class="border-0">
-                                    <td class="count-input border-0 p-0">
-                                     
-                                      <input class="quantity" type="text" style="width: 100%;" placeholder="Enter Your QTY">
-                                   
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </div>
-                          </form>
+                              <h3>Currently Available Stocks : <%= currentProduct.productStock %></h3>
                         </div>
                       </div>
                     </div>
                   </div>
                  
+                  
+
+                 <form action="/addto-cart/<%=currentProduct._id%>" method="post">
                   <div class="btn-area mb-0">
-                    <a class='btn btn-primary btn-default' href='/cart/<%= currentProduct._id %>'>Add to cart <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                    <button type="submit"><a class='btn btn-primary btn-default'>Add to cart <i class="fa fa-angle-right" aria-hidden="true"></i></a></button>
                   </div>
+                </form>
 
                   <div class="tabArea d-none">
                    

@@ -1,32 +1,34 @@
 const addressCollection = require("../Model/addressModel")
-const userModel = require("../Model/userModel")
-
-
+const userCollection = require("../Model/userModel")
 
 
 
 
 const userAddressfn = async (req,res)=>{
-    let userInfo2 = req.session.userInfo2
-    console.log(userInfo2)
-   const addressData = await addressCollection.find({
-     userId:req.session.userInfo2._id
+    let userInfo = req.session.userInfo
+   let addressData = await addressCollection.find({
+     userId:req.session.userInfo._id
    });
-   console.log(addressData)
+   if(addressData.length <= 0){
+    addressData = false
+   }
    res.render("user/Addresspage", {
-     currentUser: req.session.userInfo2._id,
+     currentUser: req.session.userInfo._id,
      addressData
    });
  }
  
+
  const addAddressfn = (req,res)=>{
  res.render("user/ADDaddress",{
  currentUser: req.session.currentUser
  })
  }
+
  
  const saveaddressfn= async (req,res)=>{
-   const user = await userModel.findOne({email:req.session.email})
+  req.session.email
+   const user = await userCollection.findOne({email:req.session.email})
    const userAddress = {
      userId : user._id,
      name : req.body.name,
@@ -41,14 +43,18 @@ const userAddressfn = async (req,res)=>{
     res.redirect('/address')
  }
  
+
+
  const editAddressfn = async (req,res)=>{
-   req.session.userInfo2;
+   req.session.userInfo;
    const existingAddress = await addressCollection.findOne({
      _id: req.params.id,
    });
    res.render("user/editAddress",{existingAddress})
  }
   
+
+
  const postEditAddressfn = async (req,res)=>{
    try {
      const address = {
@@ -74,6 +80,23 @@ const userAddressfn = async (req,res)=>{
      console.log(error);
    }
  }
+ const PrimaryCheckfn = async (req, res) => {
+  try {
+    await addressCollection.findOneAndUpdate({ _id: req.params.id },{primary:true});
+    res.redirect("back")
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const notPrimaryCheckfn = async (req, res) => {
+  try {
+    await addressCollection.findOneAndUpdate({ _id: req.params.id },{primary:false});
+    res.redirect("back")
+  } catch (error) {
+    console.error(error);
+  }
+};
 
  module.exports={
     deleteAddressfn,
@@ -81,5 +104,8 @@ const userAddressfn = async (req,res)=>{
     editAddressfn,
     saveaddressfn,
     addAddressfn,
-    userAddressfn
+    userAddressfn,
+    PrimaryCheckfn,
+    notPrimaryCheckfn
+
 }

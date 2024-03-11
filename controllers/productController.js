@@ -18,7 +18,7 @@ const productlist= async (req, res) => {
     
         let productData = await productCollection.find().skip(skip).limit(limit);
         let categoryList = await categoryCollection.find(
-          {},
+          { },
           { categoryName: true }
         );
         res.render("admin/productlist.ejs", {
@@ -32,6 +32,7 @@ const productlist= async (req, res) => {
         console.error(error);
       }
   };
+
   const addProductPage = async (req, res) => {
     try {
       const categories = await categoryCollection.find({ isListed:true});
@@ -53,7 +54,6 @@ const productlist= async (req, res) => {
          productName: req.body.productName,
       });
       if (!existingProduct) {
-        console.log("in");
         await productCollection.insertMany([
           {
             productName: req.body.productName,
@@ -106,6 +106,7 @@ const deleteProduct = async (req,res)=>{
 
   const unListProduct = async (req, res) => {
     try {
+      console.log("hajaak")
       await productCollection.findOneAndUpdate(
         { _id: req.params.id },
         { $set: { isListed: false } }
@@ -257,7 +258,7 @@ const deleteProduct = async (req,res)=>{
 
    productCategoryfn :async (req, res) => {
     req.session.userInfo
-    req.session.userInfo1
+    console.log(req.session.userInfo)
     try {
       let page = Number(req.query.page) || 1;
       let limit = 8;
@@ -265,7 +266,7 @@ const deleteProduct = async (req,res)=>{
   
       let categoryData = await categoryCollection.find({ isListed: true });
       let productData = await productCollection
-        .find({ isListed: true })
+        .find({ isListed: true }) 
         .skip(skip)
         .limit(limit)
         productData = await  req.session.categoriesFilter ? req.session.categoriesFilter : productData;
@@ -276,11 +277,10 @@ const deleteProduct = async (req,res)=>{
       let count = await productCollection.countDocuments({ isListed: true });
       let totalPages = Math.ceil(count / limit);
       let totalPagesArray = new Array(totalPages).fill(null);
-      let userInfo2 =  req.session.userInfo2;
       res.render("user/productsCategory", {
         categoryData,
         productData,
-        currentUser: req.session.userInfo2,
+        currentUser: req.session.userInfo,
         user: req.session.user,
         count,
         limit,

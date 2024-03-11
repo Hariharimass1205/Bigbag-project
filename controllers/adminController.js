@@ -5,16 +5,6 @@ const userdata = require("../Model/userModel");
 //requiring bcrypt
 const bcrypt = require("bcrypt");
 
-// const securePassword = async (password) => {
-//   try {
-//     const passwordHash = await bcrypt.hash(password, 10);
-//     return passwordHash;
-//   } catch (error) {
-//     console.log(error.message);s
-//   }
-// };
-
-//admin login page
 const loadLogin = async (req, res) => {
     try {
       if (req.session.isAdmin) {
@@ -109,7 +99,10 @@ const adminLogout = async (req, res) => {
     try {
       const { id } = req.params;
       const user = await userdata.findByIdAndUpdate(id, { isBlocked: false });
-      res.redirect("/admin/userManagement");
+      req.session.isBlocked = false
+      req.session.save()
+      console.log(req.session.isBlocked)
+      res.status(200).send({success : ture})
     } catch (error) {
       console.log(error);
     }
@@ -118,11 +111,15 @@ const adminLogout = async (req, res) => {
     try {
       const id  = req.params.id;
       const user = await userdata.findByIdAndUpdate(id, { isBlocked: true });
-      res.redirect("/admin/userManagement");
+      req.session.isBlocked = true
+      req.session.save()  
+      console.log(req.session.isBlocked)
+      res.status(200).send({success : ture})
     } catch (error) {
       console.log(error);
     }
   };
+  
   module.exports = {
     loadLogin,
     verifyLogin,

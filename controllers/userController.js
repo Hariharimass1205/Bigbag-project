@@ -1,7 +1,8 @@
-const userModel = require("../Model/userModel.js")
+const  userCollection = require("../Model/userModel.js")
+const  orderCollection = require("../Model/orderModel.js")
 const bcrypt = require("bcrypt")
 const nodemailer = require("nodemailer")
-
+const formatDate = require("../service/dateFormate.js")
 
 
 
@@ -11,20 +12,29 @@ const nodemailer = require("nodemailer")
 const landingPagefn =(req,res) =>{
   req.session.userInfo  
   req.session.userinfosignin
+  req.session.userName
   req.session.isBlocked = false
-   res.render("user/landingpage",{userInfo : req.session.userInfo})
+   res.render("user/landingpage",{userInfo : req.session.userInfo,userName:req.session.userName})
 }
+
+const loginPagefn = async (req,res)=>{
+  res.render("user/login",{userInvalid:req.session.userInvalid,isBlocked:req.session.isBlocked})
+  req.session.userInvalid = false
+  req.session.isBlocked = false
+  req.session.save()
+} 
+
 
 const logincheckfn = async (req,res)=>{
      const Email = req.body.Email
      const Password = req.body.Password
-     const userCheck = await userModel.findOne({email:Email, isBlocked: false })
-
+     const userCheck = await  userCollection.findOne({email:Email, isBlocked: false })
+     console.log(Email,Password)
      if (userCheck){
-       const passCheck =  bcrypt.compare(Password,userCheck.Password)
+       const passCheck =  await bcrypt.compare(Password,userCheck.Password)
        if(passCheck){
-        req.session.userInfo = userCheck.fname + userCheck.lname
-        req.session.userInfo2 = userCheck;
+        req.session.userName = userCheck.fname + userCheck.lname
+        req.session.userInfo = userCheck;
         req.session.email = userCheck.email
         res.redirect("/") 
        }else{
@@ -33,34 +43,33 @@ const logincheckfn = async (req,res)=>{
         res.redirect("/login")
         }
      }else{
-       req.session.isBlocked = true
+      req.session.isBlocked = true  
        req.session.userInvalid = true
        req.session.signsuccess = false
        res.redirect("/login")
      }
 }
-const loginPagefn = (req,res)=>{
-  res.render("user/login",{userInvalid:req.session.userInvalid,isBlocked:req.session.isBlocked})
-  req.session.userInvalid = false
-  req.session.isBlocked = false
-} 
 
 const logoutfn =(req,res)=>{
   req.session.userInvalid = false
+  req.session.userName = false
   req.session.userInfo = false
   res.redirect("/")
 }
 
 const sign2login = (req,res)=>{
       req.session.signsuccess = true
+      
       res.redirect("/login")
 }
 
 const signupPagefn = (req,res)=>{
   try{
     req.session.emailExist;
-    res.render("user/signup",{emailExist:req.session.emailExist})
+    req.session.userNumber;
+    res.render("user/signup",{ emailExist:req.session.emailExist , userNumber:req.session.userNumber })
     req.session.emailExist = false
+    req.session.userNumber = false
     req.session.save()
   }catch(err){
     console.log(`Error from signup ${err}`)
@@ -68,28 +77,35 @@ const signupPagefn = (req,res)=>{
 }
 
 //sign up validation and otp send
-const Existemailfn = async (req, res) => {
+const signupfn = async (req, res) => {
   let exist = req.body.Email;
+  let existNumber = req.body.Phone
   try {
-    const user = await userModel.findOne({ email: exist });
-    if (!user) {
+    const user = await  userCollection.findOne({ email: exist });
+    const userNumber = await  userCollection.findOne({ Phone: existNumber });
+    if (!user && !userNumber) {
        const Password = await bcrypt.hash(req.body.Password,10);
+       const confirmPass = await bcrypt.hash(req.body.confirmPass,10);
        const userDetail = {
          fname: req.body.fname,
          lname: req.body.lname,
          email: req.body.Email,
          Password: Password,
+         confirmPass : confirmPass,
+         Phone:req.body.Phone
         };
         req.session.userDetail = userDetail;
         const otp =  await emailOtp(req.body.Email)
         req.session.otp = otp
         console.log(otp)
         const userdetails = req.session.userDetail
-        req.session.userInfo = userdetails.fname + userdetails.lname 
+        req.session.userName = userdetails.fname + userdetails.lname 
+        req.session.userInfo = req.session.userDetail
         req.session.islogin = false
         res.render("user/otppage");
       } else {
         req.session.emailExist = true;
+        req.session.userNumber = true;
         res.redirect("/signup"); 
       }
     } catch (error) {
@@ -99,19 +115,19 @@ const Existemailfn = async (req, res) => {
   };
 
   const optVerify = async (req,res)=>{
-      const otp = req.session.otp
-     if(otp === Number(req.body.otp)){
-       const userdetails = req.session.userDetail 
-       await userModel(userdetails).save()
-       req.session.userInfo = userdetails.fname + userdetails.lname 
-       req.session.email = userdetails.email
-       req.session.islogin = true
-       res.redirect("/")
-     }else{
-      res.render("user/otppage",{invalidotp:"OTP Invalid"})
-     }
-  }
-
+    const otp = req.session.otp
+   if(otp === Number(req.body.otp)){
+     const userdetails = req.session.userDetail 
+     await  userCollection(userdetails).save()
+     req.session.userName = userdetails.fname + userdetails.lname 
+     req.session.email = userdetails.email
+     req.session.islogin = true
+     req.session.userInfo = userdetails
+     res.redirect("/")
+   }else{
+    res.render("user/otppage",{invalidotp:"OTP Invalid"})
+   }
+}
 
   const forgetpage1fn = (req,res)=>{
     try {
@@ -123,8 +139,10 @@ const Existemailfn = async (req, res) => {
 
  const forgetpage2fn = async (req,res)=>{
    try {
+
      const forgetEmail = req.body.email
     req.session.forgetEmail = req.body.email
+    
     const otp =  await Passresetotp(forgetEmail)
     req.session.resetopt = otp
     res.render("user/forgetpage2")
@@ -155,9 +173,9 @@ const forgetpage3fn = (req,res)=>{
     const newpass = req.body.NewPassword
     const email = req.session.forgetEmail
     console.log(req.session.forgetEmail)
-    const user = await userModel.findOne({ email: email });
+    const user = await  userCollection.findOne({ email: email });
     const passwordHash = await bcrypt.hash(newpass, 10);
-     const newfeild =  await userModel.findByIdAndUpdate(
+     const newfeild =  await  userCollection.findByIdAndUpdate(
         { _id: user._id },
         { $set: {Password: passwordHash} 
       })
@@ -232,23 +250,17 @@ const emailOtp = async (email) => {
 
 
 const userProfilefn = (req,res)=>{
-  const userInfo = req.session.userInfo2
-  res.render("user/Profilepage",{userInfo})
+  const userInfo = req.session.userInfo
+  res.render("user/Profilepage",{userInfo:req.session.userInfo})
 }
 
-const allordersfn = (req,res)=>{
-res.render("user/orders")
-}
 
-const singleorderfn =(req,res)=>{
-  res.render("user/singleorderpage")
-}
+
+
 
 
 module.exports={
   logincheckfn,
-  singleorderfn,
-  allordersfn,
   userProfilefn,
   forgetpage1fn,
   forgetpage2fn,
@@ -260,6 +272,7 @@ module.exports={
   ,logoutfn
   ,loginPagefn,
   signupPagefn,
-  Existemailfn,
+  signupfn,
   optVerify,
 }
+  

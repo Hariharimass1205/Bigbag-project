@@ -139,13 +139,14 @@
                       <p style="color:orange">Email or Password is Invalid</p>
                       <%}%>
                       
-                      <% if(isBlocked === true){%>
+                      <% if(isBlocked){%>
                         <p style="color:orange">User BLOCKED</p>
                         <%}%>
                     <button type="submit" onclick="location.href='#';" class="btn btn-primary btn-default w-100">log in</button>
                     <a href="/signup" type="button" class="btn btn-link w-100" ><span>Dont have an account?  </span>Sign up</a>
                     </div>
                     <a  href="/forget1"  type="submit" style="margin-left: 240px; padding:20px; margin-top: 20px; color:rgb(255, 255, 255);background-color: rgb(94, 224, 224);border-color:rgb(255, 255, 255);font-weight: 800; font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; font-size: medium; ">Forgot Password?</a>
+                  
                   </form>
                 </div>
               </div>

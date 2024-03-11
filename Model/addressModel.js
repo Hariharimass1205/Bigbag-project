@@ -8,6 +8,7 @@ const addressShcema = new mongoose.Schema({
     Address: String,
     State: String,
     City : String,
+    primary:{ type :Boolean, default:false,}
 })
 // model is a communicator for DB and node.js
 const addressCollection = mongoose.model("address", addressShcema)

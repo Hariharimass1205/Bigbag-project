@@ -59,21 +59,19 @@
                       </td>
                       <td>
                           <% if (category.isListed) { %>
-                              <form action="/admin/categories/unList/<%= category._id %>" method="POST">
-                                  <button type="submit" class="btn btn-success">Unlist</button>
-                              </form>
+                              <!-- <form action="/admin/categories/unList/<%= category._id %>" method="POST"> -->
+                                <span onclick="unlist('<%= category._id %>')">
+                                    <button type="submit" class="btn btn-success">Unlist</button>
+                                </span>
+                              <!-- </form> -->
                               <% } else { %>
-                                  <form action="/admin/categories/list/<%= category._id %>" method="POST">
-                                      <button type="submit" class="btn btn-danger">List</button>
-                                  </form>
+                                  <!-- <form action="/admin/categories/list/<%= category._id %>" method="POST"> -->
+                                    <span  onclick="list('<%= category._id %>')"> <button type="submit" class="btn btn-danger">List</button></span> 
+                                  <!-- </form> -->
                                   <% } %>
                       </td>
                       <td>
-                          <a href="/admin/categories/delete/<%= category._id %>"
-                              onclick="return confirm('Are you sure you want to delete <%= category.categoryName %> category?')"
-                              class="btn btn-info">
-                              <i class="fa fa-trash" aria-hidden="true"></i> delete
-                          </a>
+                          
                           <a href="/admin/categories/edit/<%= category._id %>" class="btn btn-info">
                               <i class="fa fa-edit" aria-hidden="true"></i> edit
                           </a>
@@ -95,5 +93,66 @@
           </ul>
       </div>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <script>
+
+
+    function unlist(data){
+  Swal.fire({
+      title: "Are you sure?",
+      text: "You can be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "unlist the Category"
+  }).then((result) => {
+      if (result.isConfirmed) {
+          fetch('/admin/categories/unList/' + data, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              }
+          }).then(() => {
+             
+              location.reload();
+          }).catch(error => console.error('Error:', error));
+          
+          cancelBtnElement.style.display = 'none';
+          cancelledBtnElement.style.display = 'block';
+      }
+  });
+
+}
+
+function list(data){
+  Swal.fire({
+      title: "Are you sure?",
+      text: "You can be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "list the Category"
+  }).then((result) => {
+      if (result.isConfirmed) {
+          fetch('/admin/categories/List/' + data, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              }
+          }).then(() => {
+             
+              location.reload();
+          }).catch(error => console.error('Error:', error));
+          
+          cancelBtnElement.style.display = 'none';
+          cancelledBtnElement.style.display = 'block';
+      }
+  });
+
+}
+
+  </script>
 <%- include('../layouts/adminFooter.ejs') %>
 

@@ -1,6 +1,8 @@
 const categoryCollection = require("../Model/categoryModel");
 const productCollection = require("../Model/productModel")
 
+
+
 const categoriesPage = async (req, res) => {
     try {
       let page = Number(req.query.page) || 1;
@@ -21,67 +23,97 @@ const categoriesPage = async (req, res) => {
   };
 
   const addCategoriesPage = async (req, res) => {
-    res.render("admin/addCategory.ejs");
+    console.log(req.session.categoryExists)
+    res.render("admin/addCategory.ejs",{categoryExists:req.session.categoryExists});
+    req.session.categoryExists = false
   };
+
 
   const addCategory = async (req, res) => {
     try {
-      let existingcategory = await categoryCollection.findOne({
-        categoryName: { $regex: new RegExp(req.body.categoryName, "i") },
-        categoryName: req.body.categoryName,
-      });console.log(existingcategory);
-  
-      if (!existingcategory) {
-        await categoryCollection.insertMany([
-          {
-            categoryName: req.body.categoriesName,
-            categoryDescription: req.body.categoriesDescription,
-          },
-        ]);
-      }
-      res.redirect("/admin/categories");
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  const editCategory = async (req, res) => {
-    try {
-      console.log(req.params.id);
-      let data = await categoryCollection.findOne({ _id: req.params.id });
-      res.render("admin/editCategory.ejs", { data: data });
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  const editCategoriesPage = async (req, res) => {
-    console.log(req.body);
-    await categoryCollection.findOneAndUpdate(
-      { _id: req.params.id },
-      {
-        $set: {
+      let categoryName = req.body.categoriesName;
+      let categoryExists = await categoryCollection.findOne({
+        categoryName: { $regex: new RegExp(`^${categoryName}$`, "i") },
+      });
+      console.log(categoryExists);
+      console.log(req.body);
+      if (!categoryExists) {
+        await new categoryCollection({
           categoryName: req.body.categoriesName,
           categoryDescription: req.body.categoriesDescription,
-        },
+        }).save();
+        req.session.categoryExists = false
+        console.log("Added category");
+        res.redirect("/admin/categories");
+      } else {
+       // const exsittext = "Category already exists!"
+        req.session.categoryExists = true
+        res.redirect("/admin/addCategories");
       }
-    );
-    res.redirect("/admin/categories");
-  };
-  const deleteCategory = async (req, res) => {
-    try {
-      console.log(req.body);
-      await categoryCollection.findOneAndDelete({ _id: req.params.id });
-      res.redirect("/admin/categories");
     } catch (error) {
-      console.error(error);
+      console.error("Error adding category:", error);
     }
   };
 
+
+  const editCategory = async (req, res) => {
+    req.session.categoryExists;
+  
+    try {
+      console.log(req.params.id);
+      let data = await categoryCollection.findOne({ _id: req.params.id });
+  
+      res.render("admin/editCategory.ejs", {
+        data: data,
+        categoryExists: req.session.categoryExists,
+      });
+      req.session.categoryExists = false;
+     req.session.save();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
+
+  const editCategoriesPage = async (req, res) => {
+    try {
+      console.log(req.body);
+      let categoryName = req.body.categoriesName;
+      let categoryExists = await categoryCollection.findOne({
+        categoryName: { $regex: new RegExp(`^${categoryName}$, "i"`) },
+      });
+      if (!categoryExists) {
+        await categoryCollection.findOneAndUpdate(
+          { _id: req.params.id },
+          {
+            $set: {
+              categoryName: req.body.categoriesName,
+              categoryDescription: req.body.categoriesDescription,
+            },
+          }
+        );
+        // console.log();
+        res.redirect("/admin/categories");
+      } else {
+        console.log("Category already exists!");
+  
+        req.session.categoryExists = true; 
+        res.redirect('back');
+      }
+    } catch (error) {
+      console.error("Error adding category:", error);
+    }
+  };
+
+
   const listCategory = async (req, res) => {
     try {
-      await categoryCollection.findOneAndUpdate(
+      console.log("hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
+         let list =  await categoryCollection.findOneAndUpdate(
         { _id: req.params.id },
         { $set: { isListed: true } }
       );
+      console.log(list)
       res.redirect("/admin/categories");
     } catch (error) {
       console.error(error);
@@ -90,10 +122,12 @@ const categoriesPage = async (req, res) => {
   const unlistCategory = async (req, res) => {
     try {
       console.log(req.params.id);
-      await categoryCollection.findOneAndUpdate(
+      console.log("byeeeeeeeeeeeeeeeeeeeeeeiiiiiii");
+     let unlist =  await categoryCollection.findOneAndUpdate(
         { _id: req.params.id },
         { $set: { isListed: false } }
       );
+      console.log(unlist)
       res.redirect("/admin/categories");
     } catch (error) {
       console.error(error);
@@ -119,9 +153,6 @@ const categoriesPage = async (req, res) => {
     }
   }
 
-
-
-
   module.exports = 
   {
     categoriesPage,
@@ -129,10 +160,9 @@ const categoriesPage = async (req, res) => {
     addCategory,
     editCategory,
     editCategoriesPage,
-    deleteCategory,
     listCategory,
     unlistCategory,
-    categoryFilterfn
+    categoryFilterfn,
   }
 
 

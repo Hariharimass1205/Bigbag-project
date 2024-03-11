@@ -1,0 +1,180 @@
+<%- include('../layouts/userHeader.ejs') %>
+
+<!-- HEADER FORM -->
+<div class="header-form-area bg-primary d-md-none">
+  <form class="header-form" action="#" method="">
+    <div class="input-group">
+      <input type="text" class="form-control py-0" required="" id="expire" placeholder="Search...">
+      <div class="input-group-append">
+        <button class="input-group-text border-0 btn bg-white" type="submit">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8.16667 14.8333C11.8486 14.8333 14.8333 11.8486 14.8333 8.16667C14.8333 4.48477 11.8486 1.5 8.16667 1.5C4.48477 1.5 1.5 4.48477 1.5 8.16667C1.5 11.8486 4.48477 14.8333 8.16667 14.8333Z" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16.5 16.5L12.875 12.875" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>            
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+
+
+      <!-- LIGHT SECTION -->
+      <section class="lightSection clearfix pageHeader">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="page-title">
+                <h2>billing &amp; Shipping address</h2>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <ol class="breadcrumb">
+                <li>
+                  <a href='/'>Home</a>
+                </li>
+                <li>
+                  <a href="/cart">cart</a>
+                </li>
+                <li class="active">Shipping Information</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MAIN CONTENT SECTION -->
+      <section class="mainContent clearfix stepsWrapper">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-8">
+              <div class="innerWrapper clearfix stepsPage">
+                <div class="row progress-wizard" style="border-bottom:0;">
+
+                  <div class="col-4 progress-wizard-step active">
+                  
+                  
+                  
+                  </div>
+
+                  <div class="col-4 progress-wizard-step disabled">
+                  
+                    
+                   
+                  </div>
+
+                  <div class="col-4 progress-wizard-step disabled">
+                   
+                  
+                  </div>
+                </div>
+                
+                <% addressData.forEach(function(address) { %>
+                  
+                <form action="#" class="row" method="POST" role="form">
+                  <div class="col-12">
+                    <div class="page-header">
+                      <h4>Shipping Address</h4>
+                    </div>
+                  </div>
+                  <div class="row checkboxArea">
+                  <div class="form-group col-md-6 col-12">
+                    <label for="">Name</label>
+                    <input type="" class="form-control" value="<%= address.name %>" disabled>
+                  </div>
+              
+                  
+                  <div class="form-group col-md-6 col-12">
+                    <label for="">Address</label>
+                    <input type="text" class="form-control" value="<%= address.Address %>" disabled>
+                  </div>
+                  <div class="form-group col-md-6 col-12">
+                    <label for="">Phone</label>
+                    <input type="text" class="form-control" value="<%= address.Phone %>" disabled>
+                  </div>
+                 
+                  <div class="form-group col-md-6 col-12">
+                    <label for="">City</label>
+                    <input type="text" class="form-control" value="<%= address.City %>" disabled>
+                  </div>
+                  <div class="form-group col-md-6 col-12">
+                    <label for="">State</label>
+                    <input type="text" class="form-control" value="<%= address.State %>" disabled>
+                  </div>
+                  <div class="form-group col-md-6 col-12">
+                    <label for="">Zip Code</label>
+                    <input type="text" class="form-control" value="641105" disabled>
+                  </div>
+                  </div>
+                  <a href="/address" ><button class="btn btn-primary" type="button" style="margin-bottom: 10px;">Set your primary Address</button></a>
+                  <% }); %>
+                  <div class="col-12">
+                    <div class="page-header">
+                      <h4>Select A Shipping Method</h4>
+                    </div>
+                  </div>
+                  <div class="row checkboxArea">
+                    <div class="col-12 col-lg-6 mb-4">
+                      <input id="checkbox1" type="radio" name="checkbox" value="1" checked="checked">
+                      <label for="checkbox1"><span></span>CASH ON DELIVERY</label>
+                      <small>Delivered in 8-12 business days.</small>
+                    </div>
+                    <div class="col-12 col-lg-6 mb-4">
+                      <input id="checkbox2" type="radio" name="checkbox" value="1">
+                      <label for="checkbox2"><span></span>ONLINE TRANSFER</label>
+                      <small>Delivered in 4-7 business days.</small>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="well well-lg clearfix">
+                      <ul class="pager">
+                        <li class="next "><a class='btn btn-primary btn-default float-end' href='/confirmOrder'>Confirm Order <i class="fa fa-angle-right"></i></a></li>
+                      </ul>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12 rightSidebar">
+              <div class="w100 cartMiniTable">
+                  <table id="cart-summary" class="std table">
+                      <tbody>
+                          <tr>
+                              <td>Total Price</td>
+                              <td class="price" id="totalPrice1">₹<%= grandTotal %></td>
+                          </tr>
+                          <% if(grandTotal>500){ %>
+                          <tr >
+                              <td>Shipping</td>
+                              <td class="price">Free shipping!</td>
+                          </tr>
+                          <% }else{ %>
+                            <tr >
+                              <td>Shipping</td>
+                              <td class="price"> ₹40 /td>
+                          </tr>
+                          <% } %>
+                           <tr>
+                              <td>Total Discount</td>
+                              <td class="price" id="totalDiscount">₹0</td>
+                          </tr>
+                          <tr style="font-weight: bolder;">
+                              <td>Grand Total</td>
+                              <td class="site-color" id="total-price">₹<span id="grandTotal"><%= grandTotal %></span>
+                              </td>
+                          </tr>
+                         
+                      </tbody>
+                      <tbody>
+                      </tbody>
+                  </table>
+  
+  
+              </div>
+              <!--  /cartMiniTable-->
+  
+          </div>
+          </div>
+        </div>
+      </section>
+      <%- include('../layouts/userFooter.ejs') %>

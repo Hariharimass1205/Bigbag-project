@@ -1,4 +1,26 @@
 <%- include('../layouts/userHeader.ejs') %>
+
+
+<!-- HEADER FORM -->
+<div class="header-form-area bg-primary d-md-none">
+  <form class="header-form" action="#" method="">
+    <div class="input-group">
+      <input type="text" class="form-control py-0" required="" id="expire" placeholder="Search...">
+      <div class="input-group-append">
+        <button class="input-group-text border-0 btn bg-white" type="submit">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8.16667 14.8333C11.8486 14.8333 14.8333 11.8486 14.8333 8.16667C14.8333 4.48477 11.8486 1.5 8.16667 1.5C4.48477 1.5 1.5 4.48477 1.5 8.16667C1.5 11.8486 4.48477 14.8333 8.16667 14.8333Z" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16.5 16.5L12.875 12.875" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>            
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+
+
+
       <!-- LIGHT SECTION -->
       <section class="lightSection clearfix pageHeader">
         <div class="container">
@@ -26,33 +48,51 @@
           <div class="row">
             <div class="col-md-12">
               <div class="btn-group me-0" role="group" aria-label="...">
-                <a class='btn btn-default' href='/Profile'><i class="fa fa-user" aria-hidden="true"></i>Profile</a>
-                <a class='btn btn-default' href='/addressAdd'><i class="fas fa-map-marker-alt" aria-hidden="true"></i>Add Address</a>
+                <a class='btn btn-default' href='/profile'><i class="fa fa-user" aria-hidden="true"></i>Profile</a>
                 <a class='btn btn-default' href='/address'><i class="fas fa-map-marker-alt" aria-hidden="true"></i>My Address</a>
+                <a class='btn btn-default' href='/cart'><i class="fas fa-map-marker-alt" aria-hidden="true"></i>Cart</a>
                 <a href="javascript:void(0)" class="btn btn-default active"><i class="fa fa-list" aria-hidden="true"></i>All Orders</a>
-                <a class='btn btn-default' href='account-wishlist.html'><i class="fa fa-gift" aria-hidden="true"></i>Wishlist</a>
+                <a class='btn btn-default' href='#'><i class="fa fa-gift" aria-hidden="true"></i>Wishlist</a>
+
               </div>
             </div>
           </div>
-          <div class="row">
-            <div class="col-md-12">
-              <div class="innerWrapper">
-                <div class="orderBox text-nowrap mb-0">
-                  <div class="table-responsive">
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <% if (orderData.length) { %>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>No. of items</th>
+                        <th>Payment Method</th>
+                        <th>Price</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>View status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% orderData.forEach(order => { %>
+                        <tr>
+                            <td>#<%= order.orderNumber %></td>
+                            <td><%= order.cartData.length %> <small>item(s)</small></td>
+                            <td><%= order.paymentType %></td>
+                            <td>₹<%= order.grandTotalCost %></td>
+                            <td><%= order.orderDateFormatted %></td>
+                            <td><span class="label label-primary"><%= order.orderStatus %></span></td>
+                            <td><a href="/orderStatus/<%= order._id %>" class="btn btn-primary btn-sm">Order Status</a></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <h1 style="color: brown;">No orders placed yet!</h1>
+        <% } %>
+        
         </div>
       </section>
-</div>
 
-</body>
 
-<!-- Mirrored from bigbag-html.netlify.app/account-all-orders by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 09 Dec 2023 09:40:49 GMT -->
-</html>
+
 <%- include('../layouts/userFooter.ejs') %>
 
 

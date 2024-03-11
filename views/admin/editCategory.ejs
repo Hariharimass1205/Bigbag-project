@@ -44,8 +44,12 @@
             </head>
 
             <body>
+                <% if(categoryExists) {%>
+                        <h4>Category Name Already Exist</h4>
+                        <% } %>
                 <div class="container mt-5">
                     <h2>Edit Category</h2>
+                    
                     <form action="/admin/editCategories/<%=data._id%>" method="POST" class="mt-4">
                         <div class="form-group">
                             <label for="categoriesName">Category Name</label>
@@ -56,7 +60,7 @@
                             <label for="categoriesDescription">Category Description</label>
                             <textarea class="form-control" id="categoriesDescription" rows="3" name="categoriesDescription"><%=data.categoryDescription%></textarea>
                         </div>
-                
+
                         <button type="submit" class="btn btn-primary">Save Changes</button>
                     </form>
                 </div>

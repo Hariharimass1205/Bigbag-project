@@ -100,10 +100,10 @@
                 <div class="orderBox myAddress mb-0 text-nowrap">
                   <div class="table-responsive">
                     <table class="table">
-                     
+                      <% if(addressData) { %>
                       <% addressData.forEach(function(address) { %>
-                        <div class="col-xs-12 col-sm-6 col-md-4">
-                            <div class="panel panel-default">
+                        <div class="col-xs-12 col-sm-6 col-md-4" >
+                            <div class="panel panel-default"  style="border-color: rgb(12, 12, 12); padding: 5px;">
                                 
                                 <div class="panel-body">
                                     <ul>
@@ -112,20 +112,42 @@
                                         <li><span class="address-line2"><%= address.Address %></span></li>
                                         <li><span class="address-line1"><%= address.State %></span></li>
                                         <li><span class="address-line1"><%= address.City %></span></li>
+                                        <% if(address.primary) { %>
+                                          <button type="" class="btn btn-primary" style="margin: 5px;">Primary</button>
+                                          <% }%>
                                     </ul>
                                 </div>
                                 <div class="panel-footer panel-footer-address">
-                                    <a href="/editAddress/<%=address._id %>" class="btn btn-sm btn-success"> <i class="fa fa-edit"> </i> Edit </a>
+                                    <a href="/editAddress/<%=address._id %>"
+                                       class="btn btn-sm btn-success"> 
+                                       <i class="fa fa-edit"> </i> Edit </a>
                                     <a class="btn btn-sm btn-danger"
-                                                                onclick="return confirm('Do you want to delete?')"
-                                                                href="/deleteAddress/<%= address._id %>">
-                                                                <i class="fa fa-minus-circle"></i> Delete
+                                       onclick="return confirm('Do you want to delete?')"
+                                       href="/deleteAddress/<%= address._id %>">
+                                    <i class="fa fa-minus-circle"></i> Delete</a>
+                                           
+                                                        <% if(address.primary == false) {%>
+                                                            <a class="btn btn-sm btn-info"
+                                                                onclick="return confirm('Do you want to use as PRIMARY Address?')"
+                                                                href="/Primary/<%= address._id %>">
+                                                                <i></i> Primry Address
                                                             </a>
+                                                            <% } else{ %>
+                                                              <a class="btn btn-sm btn-warning"
+                                                                onclick="return confirm('Do you want to use as PRIMARY Address?')"
+                                                                href="/notPrimary/<%= address._id %>">
+                                                                <i></i> Not Primary Address 
+                                                            </a>
+                                                            <% } %>
                                     <!-- <a class="btn btn-sm btn-danger" onclick="return deleteSwal('<%= address._id %>')" href="/account/deleteAddress/<%= address._id %>"> <i class="fa fa-minus-circle"></i> Delete </a> -->
                                 </div>
                             </div>
                         </div>
                         <% }); %>
+                        <%  }  else { %>
+                          <h1  style="color: brown;">No Address add yet!</h1>
+                          <% } %>
+                        
                       <tbody>
                         
                       </tbody>

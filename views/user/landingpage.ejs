@@ -128,8 +128,8 @@
                 <ul class="list-inline float-end top-right topBarLeft">
                   
                   
-                  <%  if (userInfo ){  %>
-                   <li><p style="color:rgb(194, 193, 193); padding-top: 13px;font-size: small ;"> Welcome <%=userInfo %> </p></span>
+                  <%  if (userName ){  %>
+                   <li><p style="color:rgb(194, 193, 193); padding-top: 13px;font-size: small ;"> Welcome <%=userName %> </p></span>
                   </li>
                   <a style=" color:rgb(194, 193, 193);font-size:small;" href="/logout">LOGOUT</a>
                   <% }  else { %>
@@ -197,6 +197,7 @@
                   <ul class="dropdown-menu dropdown-menu-right">
                     <li class=""><a href='/profile'>Profile</a></li>
                     <li class=""><a href='/orders'>All Orders</a></li>
+                    <li class=""><a href='/cart'>cart</a></li>
                     <li class=""><a href='/address'>Address</a></li>
                   </ul>
                 </li>
@@ -273,9 +274,7 @@
 
                 <div class="col-6">
                   <picture class="image">
-                    <source srcset="assets/img/home/banner-slider/sl1.png" media="(min-width: 1000px)">
-                    <source srcset="assets/img/home/banner-slider/sl1-md.png" media="(min-width: 600px)">
-                    <img class="img-fluid" src="assets/img/home/articles/articles-01.JPG" alt="slider-imageewfwefew">
+                    <img class="img-fluid" src="/assets/img/blog/blog-01.jpg" alt="slider-imageewfwefew">
                   </picture>
                 </div>
               </div>
@@ -285,9 +284,8 @@
               <div class="row align-items-center">
                 <div class="col-6">
                   <picture class="image">
-                    <source srcset="assets/img/home/banner-slider/sl2.png" media="(min-width: 1000px)">
-                    <source srcset="assets/img/home/banner-slider/sl2-md.png" media="(min-width: 600px)">
-                    <img class="img-fluid" src="assets/img/home/articles/articles-02.JPG" alt="slider-image123432">
+               
+                    <img class="img-fluid" src="/assets/img/blog/blog-02.jpg" alt="slider-image123432">
                   </picture>
                 </div>
 
@@ -320,9 +318,8 @@
                 </div>
                 <div class="col-6">
                   <picture class="image">
-                    <source srcset="assets/img/home/banner-slider/shoe1.png" media="(min-width: 1000px)">
-                    <source srcset="assets/img/home/banner-slider/shoe1-md.png" media="(min-width: 600px)">
-                    <img class="img-fluid" src="assets/img/home/articles/articles-02.JPG" alt="slider-image((((((((((((()))))))))))))">
+                    
+                    <img class="img-fluid" src="/assets/img/blog/blog-03.jpg" alt="slider-image((((((((((((()))))))))))))">
                   </picture>
                 </div>
               </div>

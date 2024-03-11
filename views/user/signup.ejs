@@ -37,8 +37,11 @@
                     <form action="/userDetails" method="post" role="form" id="signup">
                       <div class="form-group">
                       <%if(emailExist){%>
-                          <h4 style="color:red">Already Email exsit</h4>
+                          <h4 style="color:rgb(255, 196, 0)">Already Email  exsit</h4>
                      <%}%>
+                     <%if(userNumber){%>
+                      <h4 style="color:rgb(255, 196, 0)">Already Number  exsit</h4>
+                 <%}%>
                       <label >First Name</label>
                       <input type="text" class="form-control" name="fname" >
                     </div>
@@ -51,8 +54,18 @@
                       <input type="email" class="form-control" name="Email">
                     </div>
                     <div class="form-group">
+                      <label >Enter Number</label>
+                      <input type="Number" class="form-control" name="Phone">
+                    </div>
+                    <div class="form-group">
                       <label >Password</label>
-                      <input type="password" class="form-control" name="Password">
+                      <input type="password" class="form-control" name="Password" id="register-password" onkeyup="checkPasswordStrength();"/>
+                    </div>
+                    <div id="password-strength-status"></div>
+
+                    <div class="form-group">
+                      <label >Confirm Password</label>
+                      <input type="password" class="form-control" name="confirmPass">
                     </div>
                     <button type="submit"  class="btn btn-primary w-100">Submit</button>
                     <a href="/login" type="button" class="btn btn-link w-100" ><span>All ready have an account?</span> Log in</a>
@@ -95,13 +108,41 @@
         required:true,
         email:true
       },
-      Password:{
-        required:true,
-        maxlength:12,
-        minlength:4
-      }
+      Password: {
+          required: true,
+          minlength: 6,
+          pattern:/^[a-zA-Z0-9]/
+      },
+      confirmPass: {
+          required: true,
+          minlength: 6,
+          equalTo: "#register-password",
+       },
     }
   })
+  function checkPasswordStrength() {
+	var number = /([0-9])/;
+	var alphabets = /([a-zA-Z])/;
+	var special_characters = /([~,!,@,#,$,%,^,&,*,-,_,+,=,?,>,<])/;
+	var password = $('#register-password').val().trim();
+	if (password.length < 6) {
+		$('#password-strength-status').removeClass();
+		$('#password-strength-status').addClass('weak-password');
+		$('#password-strength-status').html("Weak (should be atleast 6 characters.)");
+	} else {
+		if (password.match(number) && password.match(alphabets) && password.match(special_characters)) {
+			$('#password-strength-status').removeClass();
+			$('#password-strength-status').addClass('strong-password');
+			$('#password-strength-status').html("Strong");
+		}
+		else {
+			$('#password-strength-status').removeClass();
+			$('#password-strength-status').addClass('medium-password');
+			$('#password-strength-status').html("Medium (should include alphabets, numbers and special characters.)");
+		}
+	}
+}
+
 </script>
 
 
