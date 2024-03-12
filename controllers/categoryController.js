@@ -82,6 +82,7 @@ const categoriesPage = async (req, res) => {
       let categoryExists = await categoryCollection.findOne({
         categoryName: { $regex: new RegExp(`^${categoryName}$, "i"`) },
       });
+      console.log(categoryExists)
       if (!categoryExists) {
         await categoryCollection.findOneAndUpdate(
           { _id: req.params.id },
@@ -96,7 +97,6 @@ const categoriesPage = async (req, res) => {
         res.redirect("/admin/categories");
       } else {
         console.log("Category already exists!");
-  
         req.session.categoryExists = true; 
         res.redirect('back');
       }

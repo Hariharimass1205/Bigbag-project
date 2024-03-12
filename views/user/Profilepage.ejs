@@ -118,15 +118,23 @@
                           </div>
                         </div>
                         <div class="form-group row">
-                          <label for="" class="col-md-3 control-label">Email Address</label>
+                          <label  class="col-md-3 control-label">Email Address</label>
                           <div class="col-md-9">
                             <h3> <%= userInfo.email %></h3>
                           </div>
                         </div>
+                        <% if(userInfo.Phone){%>
+                        <div class="form-group row">
+                          <label  class="col-md-3 control-label">Phone</label>
+                          <div class="col-md-9">
+                            <h3> <%= userInfo.Phone %></h3>
+                          </div>
+                        </div>
+                        <% } %>
                         <div class="form-group row">
                           <label for="" class="col-md-3 control-label">Password</label>
                           <div class="col-md-9" >
-                            <h3 value="**********" > *********** </h3>
+                            <h3 value="**********" > ******** </h3>
                           </div>
                         </div>
                         <% } else{%>
@@ -135,6 +143,13 @@
                           </div>
                           <%}%>
                       </form>
+                      <div class="row">
+                        <div class="col-12">
+                          <div class="btn-group me-0" role="group" aria-label="...">
+                            <a href="/profileEdit" class="fas fa-marker-alt"><i class="fa fa-user" aria-hidden="true"></i>EDIT PROFILE</a>
+                          </div>
+                        </div>
+                      </div>
                 </div>
               </div>
             </div>
@@ -184,7 +199,9 @@
 
 <!-- Mirrored from bigbag-html.netlify.app/account-profile by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 09 Dec 2023 09:40:49 GMT -->
 </html>
-
+<script>
+ 
+</script>
 <%- include('../layouts/userFooter.ejs') %>
       <!-- FOOTER SM -->
 

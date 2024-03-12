@@ -246,13 +246,9 @@ const deleteProduct = async (req,res)=>{
     listProduct,
     deleteProduct,
     sortPricefn,
+
+
     
-  
-
-
-
-
-
   // //    user product process fn below
 
 
@@ -292,8 +288,7 @@ const deleteProduct = async (req,res)=>{
       console.error("Error fetching product data:", error);
       res.status(500).send("Internal Server Error");
     }
-  }
-,
+  },
 
 
       ProductDetailsfn : async (req, res) => {
@@ -302,7 +297,7 @@ const deleteProduct = async (req,res)=>{
         _id: req.params.id,
       });
       res.render("user/productDetails", {
-        user: req.session.user,
+        user: req.session.user, 
         currentProduct,
       });
       console.log(currentProduct);

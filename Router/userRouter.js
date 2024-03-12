@@ -54,6 +54,9 @@ const {
     logoutfn,
     optVerify,
     logincheckfn,
+    ProfileEditpage,
+    passChange,
+    PostpassChange
 } = require("../controllers/userController.js")
 
 const {
@@ -80,6 +83,11 @@ userRouter.post("/otp",optVerify)
 
 //pageing process
 userRouter.get("/profile",isUser,isBlocked,userProfilefn)
+userRouter.get("/profileEdit",isUser,isBlocked,ProfileEditpage)
+userRouter.get('/passchange',isUser,isBlocked,passChange)
+userRouter.post("/passChangeCheck", isUser,isBlocked,PostpassChange)
+
+
 userRouter.get("/address",isUser,isBlocked,userAddressfn)
 userRouter.get("/addressAdd",isUser,isBlocked,addAddressfn)
 userRouter.post('/saveAddress',isBlocked,saveaddressfn)

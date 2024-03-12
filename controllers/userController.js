@@ -29,9 +29,11 @@ const logincheckfn = async (req,res)=>{
      const Email = req.body.Email
      const Password = req.body.Password
      const userCheck = await  userCollection.findOne({email:Email, isBlocked: false })
-     console.log(Email,Password)
      if (userCheck){
        const passCheck =  await bcrypt.compare(Password,userCheck.Password)
+       console.log(passCheck);
+       console.log(Password);
+       console.log(userCheck.Password);
        if(passCheck){
         req.session.userName = userCheck.fname + userCheck.lname
         req.session.userInfo = userCheck;
@@ -94,13 +96,12 @@ const signupfn = async (req, res) => {
          confirmPass : confirmPass,
          Phone:req.body.Phone
         };
-        req.session.userDetail = userDetail;
+        req.session.userInfo = userDetail;
         const otp =  await emailOtp(req.body.Email)
         req.session.otp = otp
         console.log(otp)
-        const userdetails = req.session.userDetail
+        const userdetails = req.session.userInfo
         req.session.userName = userdetails.fname + userdetails.lname 
-        req.session.userInfo = req.session.userDetail
         req.session.islogin = false
         res.render("user/otppage");
       } else {
@@ -139,10 +140,8 @@ const signupfn = async (req, res) => {
 
  const forgetpage2fn = async (req,res)=>{
    try {
-
      const forgetEmail = req.body.email
     req.session.forgetEmail = req.body.email
-    
     const otp =  await Passresetotp(forgetEmail)
     req.session.resetopt = otp
     res.render("user/forgetpage2")
@@ -253,6 +252,60 @@ const userProfilefn = (req,res)=>{
   const userInfo = req.session.userInfo
   res.render("user/Profilepage",{userInfo:req.session.userInfo})
 }
+ const ProfileEditpage = (req,res)=>{
+  const userInfo = req.session.userInfo
+  res.render("user/editProfile",{userInfo:req.session.userInfo})
+ }
+ const passChange = (req,res)=>{
+  const userInfo = req.session.userInfo
+  req.session.currentPasswrong
+  res.render("user/passChange",{userInfo:req.session.userInfo , PassWrong : req.session.currentPasswrong})
+  req.session.currentPasswrong = false
+ }
+ const PostpassChange = async (req,res)=>{
+  try{
+    const email = req.session.email
+    console.log(req.session.email)
+  let password = req.body.CurrentPassword
+  console.log('hesujrmm,r,oirmmjrirmrmirdmidim');
+  console.log(password,email)
+  const currentPass = await userCollection.findOne({ email: email })
+  const passCheck = await bcrypt.compare(password,currentPass.Password)
+  console.log(currentPass.Password)
+  if(passCheck){
+    const confirmPass = await bcrypt.hash(password,10);
+    console.log(confirmPass)
+const updatepass = await  userCollection.findByIdAndUpdate(
+    { _id: currentPass._id },
+     {Password: confirmPass} 
+  )
+  const currentPas = await userCollection.findOne({ email: email })
+  console.log(currentPas)
+  res.redirect("/profile")
+  }else{
+    req.session.currentPasswrong = true
+    redirect("/passchange")
+  }
+ }catch(error){
+console.log(error);
+ }
+}
+
+//  const postProfileEditpage = async (req,res)=>{
+//   try {
+//     const address = {
+//       name: req.body.name,
+//       Phone: req.body.Phone,
+//       Address: req.body.Address,
+//       State: req.body.State,
+//       City: req.body.City,
+//     };
+//     await addressCollection.updateOne({ _id: req.params.id }, address);
+//     res.redirect("/address");
+//   } catch (error) {
+//     console.error(error);
+//   }
+// }
 
 
 
@@ -274,5 +327,8 @@ module.exports={
   signupPagefn,
   signupfn,
   optVerify,
+  ProfileEditpage,
+  passChange,
+  PostpassChange
 }
   
