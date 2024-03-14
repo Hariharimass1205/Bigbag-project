@@ -42,13 +42,12 @@ const addressCollection = require("../Model/addressModel");
  
   const cartpagefn = async (req, res) => {
     try {
-      const userInfo = req.session.userInfo
-      console.log(userInfo._id)
+      const userInfo = req.session?.userInfo
       let userCartData = await grandTotal(req);
       let empty;
       userCartData == 0 ? (empty = true) : (empty = false);
       res.render("user/cartpage", {
-        user: req.session.userInfo,
+        user: req.session?.userInfo,
         userCartData,
         grandTotal: req.session.grandTotal,
         empty,
@@ -134,7 +133,11 @@ const decQty = async (req, res) => {
 
   const getcheckoutpagefn = async (req, res) => {
     try {
-      let cartData = await cartCollection
+      const addresscheck = await addressCollection.find({userId:req.session?.userInfo?._id})
+      if(addresscheck.length==0){
+          res.redirect("/addressAdd")
+      }else{
+        let cartData = await cartCollection
         .find({ userId: req.session.userInfo._id, productId: req.params.id })
         .populate("productId");
       let addressData = await addressCollection.find({
@@ -162,6 +165,8 @@ const decQty = async (req, res) => {
         addressData: req.session.address,
         addressData,
       });
+      }
+      
     } catch (error) {
       res.redirect("/cart");
     }

@@ -13,7 +13,9 @@ const productlist= async (req, res) => {
         let page = Number(req.query.page) || 1;
         let limit = 4;
         let skip = (page - 1) * limit;
-    
+        console.log(skip)
+        console.log(limit)
+        console.log(page)
         let   count = await productCollection.find().estimatedDocumentCount();
     
         let productData = await productCollection.find().skip(skip).limit(limit);
@@ -33,10 +35,10 @@ const productlist= async (req, res) => {
       }
   };
 
+
   const addProductPage = async (req, res) => {
     try {
       const categories = await categoryCollection.find({ isListed:true});
-  
       console.log(categories);
       res.render("admin/addproduct.ejs", {
         categories,
@@ -46,6 +48,8 @@ const productlist= async (req, res) => {
       console.error(error);
     }
   };
+
+
   const addProduct = async (req, res) => {
     console.log(productCollection);
     try {

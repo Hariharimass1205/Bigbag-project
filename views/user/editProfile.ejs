@@ -50,8 +50,7 @@
     class="container rounded mt-0 mb-5"
   ><div style="width: 50vw; background-color: rgb(218, 218, 218)">
     <div style="width: 50vw; padding: 30px">
-      <form id="editAddressForm" action="/editProfile/<%=userInfo._id %>" method="post">
-        
+      <form id="editAddressForm" action="/PostprofileEdit/<%=userInfo._id %>" method="post">
         <div class="row">
           <div class="col-md-6">
             <div class="form-group">
@@ -79,7 +78,6 @@
               />
             </div>
           </div>
-
           <div class="col-md-12">
             <div class="form-group">
               <label> Email Address </label>
@@ -99,7 +97,7 @@
                 <label>Phone</label>
                 <input
                   type="text"
-                  name="fname"
+                  name="Phone"
                   class="form-control p_input"
                   value="<%=userInfo.Phone %>"
                   required

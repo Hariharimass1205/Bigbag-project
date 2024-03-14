@@ -1,5 +1,17 @@
 const orderCollection = require("../Model/orderModel")
 const formatDate = require("../service/dateFormate")
+const razorPay = require("razorpay")
+
+const KeyId =  "rzp_test_yBYPpPQ1FzeSar"
+const KeySecret = "N0zlDidgtQHj7bToX3POisV3"
+
+
+let instance = new razorPay({
+  key_id: "rzp_test_v75ssDWKeJR3Gp",
+  key_secret: "gywIPeIcHdk4xGYGroN8opAg",
+});
+
+
 // order management page
 const orderManagement = async (req, res) => {
     try {
@@ -175,7 +187,37 @@ const singleorderfn =  async (req, res) => {
   }
 }
  
-  module.exports ={
+const genOrder = async (req,res)=>{
+  try{
+
+    console.log(`req reached genOrder `)
+    console.log(JSON.stringify(req.params.id))
+      // console.log("genOrder\n"+JSON.stringify(req.body))
+      // req.session.orderDetail = req.body.amount
+      // console.log( `wedewewifndcmob ${req.body}`)
+      // console.log( JSON.stringify(req.body))
+      req.session.save()
+      const payMentValue = req.body
+      instance.orders
+        .create({
+          amount: Number(req.params.id) + "00",
+          currency: "INR",
+          receipt: "receipt#1",
+        }).then((order) => {
+          console.log('1')
+
+          console.log(`order\n${order.id} `)
+          res.json(order)
+          // return res.send({ orderId: order.id });
+        }).catch((err)=>{
+          console.log(err)
+        });
+  }catch(err){
+      console.log(err)
+  }
+}
+
+  module.exports = {
     orderManagement,
     changeStatusPending,
     allordersfn,
@@ -186,5 +228,6 @@ const singleorderfn =  async (req, res) => {
     changeStatusDelivered,
     changeStatusReturn,
     changeStatusCancelled,
+    genOrder
 }
   

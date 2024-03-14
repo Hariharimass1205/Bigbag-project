@@ -175,8 +175,13 @@
                   
 
                  <form action="/addto-cart/<%=currentProduct._id%>" method="post">
+                  <div class="btn-area mb-0" >
+                    <button style="margin-bottom: 20px; font-size: medium;" type="submit" class="btn btn-primary">Add to cart</button>
+                  </div>
+                </form>
+                <form action="/wishList/<%= currentProduct._id %>" >
                   <div class="btn-area mb-0">
-                    <button type="submit"><a class='btn btn-primary btn-default'>Add to cart <i class="fa fa-angle-right" aria-hidden="true"></i></a></button>
+                    <button style="margin-bottom: 20px; font-size: medium; width: fit-content;" type="submit" class="btn btn-primary">Add to  Wishlist</button>
                   </div>
                 </form>
 

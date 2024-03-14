@@ -8,6 +8,8 @@ const userRouter = require("./Router/userRouter.js")
 const adminRouter = require("./Router/adminRouter.js")
 const morgan = require("morgan");
 
+require("dotenv").config()
+
 
 app.set("view engine","ejs")
  

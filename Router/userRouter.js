@@ -2,7 +2,11 @@ const express = require("express")
 const userRouter = express.Router()
 const {isUser,isBlocked} = require("../middleware/userloginmiddleware.js")
 
-
+const {
+    wishlistpage,
+    addToWishlistController,
+    removeFromWishList
+}= require("../controllers/wishlistController.js")
 
 const {
     cartpagefn,
@@ -56,7 +60,8 @@ const {
     logincheckfn,
     ProfileEditpage,
     passChange,
-    PostpassChange
+    PostpassChange,
+    postEditprofilefn
 } = require("../controllers/userController.js")
 
 const {
@@ -64,6 +69,7 @@ const {
     singleorderfn,
     cancelOrder,
     returnRequest,
+    genOrder
 }= require("../controllers/orderController.js")
 
 //login process
@@ -81,11 +87,13 @@ userRouter.post("/resentotp",insertUser)
 userRouter.post("/otp",optVerify)
 
 
+
 //pageing process
 userRouter.get("/profile",isUser,isBlocked,userProfilefn)
 userRouter.get("/profileEdit",isUser,isBlocked,ProfileEditpage)
-userRouter.get('/passchange',isUser,isBlocked,passChange)
-userRouter.post("/passChangeCheck", isUser,isBlocked,PostpassChange)
+userRouter.post('/PostprofileEdit/:id',isUser,isBlocked,postEditprofilefn)
+userRouter.get('/passchange', isUser,isBlocked,passChange)
+userRouter.patch('/changePassword',isUser,isBlocked,PostpassChange)
 
 
 userRouter.get("/address",isUser,isBlocked,userAddressfn)
@@ -100,12 +108,16 @@ userRouter.get("/orders",isUser,allordersfn)
 userRouter.get("/orderStatus/:id",isBlocked,singleorderfn)
 
 
+
 //forget password process
 userRouter.get("/forget1",isBlocked,forgetpage1fn)
 userRouter.post("/forget2",isBlocked,forgetpage2fn)
 userRouter.post("/forget3",isBlocked,forgetpage3fn)
 userRouter.post("/forget4",isBlocked,forgetpage4fn)
 userRouter.post("/resenOTP",isBlocked, optVerify)
+
+
+
 
 
 // product visibility process
@@ -122,6 +134,16 @@ userRouter.put('/cart/decQty/:id',isBlocked,decQty)
 userRouter.put('/cart/incQty/:id',isBlocked,incQty)
 userRouter.delete('/cart/delete/:id',isBlocked,deleteFromCart);
 userRouter.get("/checkout",isBlocked,getcheckoutpagefn)
+
+
+//wishlist
+userRouter.get('/wishlist', isBlocked,isUser,wishlistpage)
+userRouter.get('/wishlist/:id', isBlocked,isUser,addToWishlistController) 
+userRouter.delete('/wishlist/delete/:id', isBlocked,isUser,removeFromWishList) 
+
+
+userRouter.post("/razorpayOrderCreated:id",isBlocked,isUser,genOrder)
+
 
 userRouter.all('/confirmOrder',orderPlacedEnd)
 userRouter.put('/cancelOrder/:id',cancelOrder )
