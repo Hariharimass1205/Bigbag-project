@@ -195,7 +195,6 @@
           window.location.href == '/confirmOrder'
         } else if (selected == 'Razor Pay') {
           const amount = (document.getElementById("grandTotal").textContent).trim()
-          alert(amount)
           const  razor = await fetch("/razorpayOrderCreated"+amount, {
             method: 'POST',
             header: { 'Content-Type': "application/json" }, 
@@ -219,7 +218,7 @@
             currency: "INR",
             name: "Titen Watches",
             description: "Test Transaction",
-            callback_url: "/checkout/orderPlaced",
+            callback_url: "/confirmOrder",
             image: "assets/img/comming-soon/logo-comming.png",
             credit_id: creditId,
             theme: {

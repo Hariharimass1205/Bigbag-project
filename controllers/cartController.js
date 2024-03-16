@@ -3,7 +3,7 @@ const productCollection = require("../Model/productModel");
 const userCollection = require("../Model/userModel");
 const cartCollection = require("../Model/cartModel");
 const orderCollection = require("../Model/orderModel");
-const addressCollection = require("../Model/addressModel");
+const addressCollection = require("../Model/addressModel");  
 
 
 
@@ -37,9 +37,9 @@ const addressCollection = require("../Model/addressModel");
       console.log(error);
     }
   }
-  
-  
- 
+
+
+
   const cartpagefn = async (req, res) => {
     try {
       const userInfo = req.session?.userInfo
@@ -56,6 +56,7 @@ const addressCollection = require("../Model/addressModel");
       console.error(error);
     }
   };
+
 
 
   const addtoCart = async (req, res) => {
@@ -86,6 +87,8 @@ const addressCollection = require("../Model/addressModel");
     }
   };
 
+
+
 const incQty = async (req, res) => {
   try {
     let cartProduct = await cartCollection
@@ -102,6 +105,8 @@ const incQty = async (req, res) => {
     console.error(error);
   }
 };
+
+
 
 const decQty = async (req, res) => {
   try {
@@ -130,6 +135,8 @@ const decQty = async (req, res) => {
       console.error(error);
     }
   };
+
+  
 
   const getcheckoutpagefn = async (req, res) => {
     try {
@@ -173,7 +180,8 @@ const decQty = async (req, res) => {
   };
 
   const orderPlacedEnd = async (req, res) => {
-    console.log(req.session.userInfo)
+    try {
+      console.log(req.session.userInfo)
     let cartData = await cartCollection
       .find({ userId: req.session.userInfo._id })
       .populate("productId");
@@ -183,9 +191,7 @@ const decQty = async (req, res) => {
       v.productId.productStock -= v.productQuantity; //reducing from stock qty
       await v.productId.save();
       return v;
-    });
-    
-    
+    })
     let orderData= await orderCollection.findOne({ _id: req.session.currentOrder._id})
     if(orderData.paymentType =='toBeChosen'){
       orderData.paymentType = 'COD'
@@ -203,6 +209,100 @@ const decQty = async (req, res) => {
     //delete product from cart since the order is placed
     await cartCollection.deleteMany({ userId: req.session.userInfo._id });
     console.log("deleting finished");
+    } catch (error) {
+      console.log(error)
+    }
   };
 
-  module.exports={cartpagefn,addtoCart,decQty,incQty,deleteFromCart,getcheckoutpagefn,orderPlacedEnd}
+  const orderPlaced = async (req, res) => {
+    try {
+      if (req.body.razorpay_payment_id) {
+        //razorpay payment
+        await orderCollection.updateOne(
+          { _id: req.session.currentOrder._id },
+          {
+            $set: {
+              paymentId: req.body.razorpay_payment_id,
+              paymentType: "Razorpay",
+            },
+          }
+        );
+        res.redirect("/checkout/orderPlacedEnd");
+      } else if (req.body.walletPayment) {
+        const walletData = await walletCollection.findOne({
+          userId : req.session.currentUser._id,
+        });
+        if (walletData.walletBalance >= req.session.grandTotal) {
+          walletData.walletBalance -= req.session.grandTotal;
+  
+  
+          // wallet tranaction data 
+          let walletTransaction = {
+            transactionDate : new Date(),
+            transactionAmount: -req.session.grandTotal,
+            transactionType: "Debited for placed order",
+          };
+          walletData.walletTransaction.push(walletTransaction)
+          await walletData.save();
+  
+          await orderCollection.updateOne(
+            { _id: req.session.currentOrder._id },
+            {
+              $set: {
+                paymentId: Math.floor(Math.random()*9000000000) + 1000000000 ,
+                paymentType: "Wallet",
+              },
+            })
+          res.json({ success: true });
+        } else {
+          return res.json({ insufficientWalletBalance: true });
+        }
+      } else {
+        //incase of COD
+        await orderCollection.updateOne(
+          { _id: req.session.currentOrder._id },
+          {
+            $set: {
+              paymentId: "generatedAtDelivery",
+              paymentType: "COD",
+            },
+          }
+        );
+  
+        res.json({ success: true });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
+  module.exports={cartpagefn,addtoCart,decQty,incQty,deleteFromCart,getcheckoutpagefn,orderPlacedEnd,orderPlaced}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

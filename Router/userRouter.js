@@ -15,20 +15,19 @@ const {
     incQty,
     deleteFromCart,
     getcheckoutpagefn,
-    orderPlacedEnd
+    orderPlacedEnd,
+    orderPlaced
 }= require("../controllers/cartController.js")
 
 const {
     categoryFilterfn,
 }=require("../controllers/categoryController.js")
 
-
 const {
     sortPricefn,
     productCategoryfn,
     ProductDetailsfn
 }= require("../controllers/productController.js")
-
 
 const { 
     userAddressfn,
@@ -135,7 +134,6 @@ userRouter.put('/cart/incQty/:id',isBlocked,incQty)
 userRouter.delete('/cart/delete/:id',isBlocked,deleteFromCart);
 userRouter.get("/checkout",isBlocked,getcheckoutpagefn)
 
-
 //wishlist
 userRouter.get('/wishlist', isBlocked,isUser,wishlistpage)
 userRouter.get('/wishlist/:id', isBlocked,isUser,addToWishlistController) 
@@ -143,11 +141,15 @@ userRouter.delete('/wishlist/delete/:id', isBlocked,isUser,removeFromWishList)
 
 
 userRouter.post("/razorpayOrderCreated:id",isBlocked,isUser,genOrder)
-
-
+userRouter.all('/checkout/orderPlaced',isBlocked,isUser, orderPlaced);
 userRouter.all('/confirmOrder',orderPlacedEnd)
-userRouter.put('/cancelOrder/:id',cancelOrder )
-userRouter.put('/returnorder/:id',returnRequest)
+userRouter.put('/account/orderList/orderStatus/cancelOrder/:id',cancelOrder )
+userRouter.put('/account/orderList/orderStatus/returnorder/:id',returnRequest)
+
+
+
+
+
 //Main userRouter connect with Main page for connection
 module.exports = userRouter
 

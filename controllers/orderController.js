@@ -1,10 +1,11 @@
 const orderCollection = require("../Model/orderModel")
+const walletCollection = require("../Model/walletModel")
+const userCollection = require("../Model/userModel")
 const formatDate = require("../service/dateFormate")
 const razorPay = require("razorpay")
 
 const KeyId =  "rzp_test_yBYPpPQ1FzeSar"
 const KeySecret = "N0zlDidgtQHj7bToX3POisV3"
-
 
 let instance = new razorPay({
   key_id: "rzp_test_v75ssDWKeJR3Gp",
@@ -67,12 +68,14 @@ const changeStatusDelivered = async (req, res) => {
     console.error(error);
   }
 };
+
 //return
 const changeStatusReturn = async (req, res) => {
   try {
+    
     await orderCollection.findOneAndUpdate(
       { _id: req.params.id },
-      { $set: { orderStatus: "Retrun" } }
+      { $set: { orderStatus: "Return" } }
     );
     res.redirect("/admin/orderManagement");
   } catch (error) {
@@ -86,7 +89,9 @@ const changeStatusCancelled = async (req, res) => {
     let orderData = await orderCollection
       .findOne({ _id: req.params.id })
       .populate("userId");
-    await walletCollection.findOneAndUpdate( { userId : orderData.userId._id  }, { walletBalance: orderData.grandTotalCost })
+    await walletCollection.findOneAndUpdate(
+       { userId : orderData.userId._id  }, 
+       { walletBalance: orderData.grandTotalCost })
 
     await userCollection.findByIdAndUpdate(
       { _id: orderData.userId._id },
@@ -130,7 +135,7 @@ const singleorderfn =  async (req, res) => {
       .populate("addressChosen");
       console.log(orderData)
     let isCancelled = orderData.orderStatus == "Cancelled";
-    let isReturn = orderData.orderStatus == "Retrun";
+    let isReturn = orderData.orderStatus == "Return";
     res.render("user/singleorderpage", {
       currentUser: req.session.userInfo,
       orderData,
@@ -150,23 +155,6 @@ const singleorderfn =  async (req, res) => {
       { _id: req.params.id },
       { $set: { orderStatus: "Cancelled", cancelReason } }
     );
-    res.json({ success: true });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, error: "Internal server error" });
-  }
-}
- const returnRequest = async (req, res) => {
-  try {
-    const { ReturnReason } = req.body;
-
-    const orderData = await orderCollection.findOne({ _id: req.params.id });
-
-    await orderCollection.findByIdAndUpdate(
-      { _id: req.params.id },
-      { $set: { orderStatus: "Retrun", ReturnReason } }
-    );
-
     let walletTransaction = {
       transactionDate: new Date(),
       transactionAmount: orderData.grandTotalCost,
@@ -174,19 +162,49 @@ const singleorderfn =  async (req, res) => {
     };
 
     await walletCollection.findOneAndUpdate(
-      { userId: req.session.currentUser._id },
+      { userId: req.session.userInfo._id },
       {
         $inc: { walletBalance: orderData.grandTotalCost },
         $push: { walletTransaction },
       }
     );
-
     res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: "Internal server error" });
+  }
+}
+
+
+ const returnRequest = async (req, res) => {
+  try {
+    const { ReturnReason } = req.body;
+    const orderData = await orderCollection.findOne({ _id: req.params.id });
+    await orderCollection.findByIdAndUpdate(
+      { _id: req.params.id },
+      { $set: { orderStatus: "Return", ReturnReason } }
+    );
+    
+    let walletTransaction = {
+      transactionDate: new Date(),
+      transactionAmount: orderData.grandTotalCost,
+      transactionType: "Refund from cancelled Order",
+    };
+
+    await walletCollection.findOneAndUpdate(
+      { userId: req.session.userInfo._id },
+      {
+        $inc: { walletBalance: orderData.grandTotalCost },
+        $push: { walletTransaction },
+      }
+    )
+      res.json({ success: true });
   } catch (error) {
     console.error(error);
   }
 }
  
+
 const genOrder = async (req,res)=>{
   try{
 
@@ -204,9 +222,6 @@ const genOrder = async (req,res)=>{
           currency: "INR",
           receipt: "receipt#1",
         }).then((order) => {
-          console.log('1')
-
-          console.log(`order\n${order.id} `)
           res.json(order)
           // return res.send({ orderId: order.id });
         }).catch((err)=>{
