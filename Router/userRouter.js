@@ -16,7 +16,9 @@ const {
     deleteFromCart,
     getcheckoutpagefn,
     orderPlacedEnd,
-    orderPlaced
+    orderPlaced,
+    applyCoupon,
+    storedApplycoupon
 }= require("../controllers/cartController.js")
 
 const {
@@ -133,6 +135,9 @@ userRouter.put('/cart/decQty/:id',isBlocked,decQty)
 userRouter.put('/cart/incQty/:id',isBlocked,incQty)
 userRouter.delete('/cart/delete/:id',isBlocked,deleteFromCart);
 userRouter.get("/checkout",isBlocked,getcheckoutpagefn)
+userRouter.post("/checkout/applyCoupon",isBlocked,applyCoupon);
+userRouter.post("/orders/storeDiscount",isBlocked,storedApplycoupon);
+
 
 //wishlist
 userRouter.get('/wishlist', isBlocked,isUser,wishlistpage)
@@ -140,11 +145,12 @@ userRouter.get('/wishlist/:id', isBlocked,isUser,addToWishlistController)
 userRouter.delete('/wishlist/delete/:id', isBlocked,isUser,removeFromWishList) 
 
 
+
 userRouter.post("/razorpayOrderCreated:id",isBlocked,isUser,genOrder)
-userRouter.all('/checkout/orderPlaced',isBlocked,isUser, orderPlaced);
-userRouter.all('/confirmOrder',orderPlacedEnd)
-userRouter.put('/account/orderList/orderStatus/cancelOrder/:id',cancelOrder )
-userRouter.put('/account/orderList/orderStatus/returnorder/:id',returnRequest)
+userRouter.post('/checkout/orderPlaced',isBlocked,isUser,orderPlaced);
+userRouter.all('/confirmOrder',isBlocked,isUser,orderPlacedEnd)
+userRouter.put('/account/orderList/orderStatus/cancelOrder/:id',isBlocked,isUser,cancelOrder )
+userRouter.put('/account/orderList/orderStatus/returnorder/:id',isBlocked,isUser,returnRequest)
 
 
 

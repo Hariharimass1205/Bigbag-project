@@ -116,7 +116,7 @@
                   </div>
                   <div class="row checkboxArea">
                     <div class="col-12 col-lg-6 mb-4">
-                      <input id="checkbox1" type="radio" name="checkbox" value="CASH ON DELIVERY" checked="checked">
+                      <input id="checkbox1" type="radio" name="checkbox" value="CASH ON DELIVERY" checked>
                       <label for="checkbox1"><span></span>CASH ON DELIVERY</label>
                       <small>Delivered in 8-12 business days.</small>
                     </div>
@@ -173,10 +173,32 @@
                           </span>
                         </td>
                       </tr>
+                      <tr>
+                        <td colspan="2">
+                            <div id="couponContainer" style="display: none;">
+                                <div class="input-append couponForm">
+                                  <form id="couponApplyForm">
+                                    <input class="col-lg-8" name="couponCode" id="appendedInputButton" type="text" placeholder="Enter coupon code">
+                                    <button class="col-lg-4 btn btn-success" type="submit">Apply!</button>
+                                  </form>
+                                </div>
+                              </div>
+                        </td>
+                        
+                    </tr>
+                    
               </tbody>
-              <tbody>
-              </tbody>
+              
             </table>
+            <div class="coupon-container">
+              <% coupons.reverse().forEach(function(coupon) { %>
+                <div class="coupon-card">
+                  <h3><%= coupon.couponCode %></h3>
+                  <p>Discount: <%= coupon.discountPercentage %>%</p>
+                  <p>Minimum Purchase: <%= coupon.minimumPurchase %></p>
+                </div>
+              <% }); %>
+            </div>
           </div>
           <!--  /cartMiniTable-->
 
@@ -184,7 +206,11 @@
       </div>
     </div>
   </section>
+      
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
   <%- include('../layouts/userFooter.ejs') %>
 
 
@@ -192,21 +218,25 @@
       async function placeorder() {
         const selected = document.querySelector("input[type=radio]:checked").value
         if (selected == 'CASH ON DELIVERY') {
-          window.location.href == '/confirmOrder'
+          console.log("hiii")
+          window.location.href = "/confirmOrder"
         } else if (selected == 'Razor Pay') {
+          console.log("ferfrii")
           const amount = (document.getElementById("grandTotal").textContent).trim()
           const  razor = await fetch("/razorpayOrderCreated"+amount, {
             method: 'POST',
-            header: { 'Content-Type': "application/json" }, 
+            header: { 'Content-Type': "application/json" },
             body: JSON.stringify({amount})
            });
           const response = await razor.json()
           openRazorpay(amount,response.id)
         } else {
-
+          console.log("byweeeeeeeeeei")
         }
       }
     </script>
+
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
       // Function to open Razorpay
       async function openRazorpay(amount, creditId) {
@@ -232,3 +262,83 @@
         }
       }
     </script>
+
+<script>
+  const isAddonCheckout = true;
+  function toggleCouponContainer() {
+    const couponContainer = document.getElementById('couponContainer');
+    couponContainer.style.display = isAddonCheckout ? 'block' : 'none';
+  }
+  toggleCouponContainer();
+  </script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const couponApplyFormElement = document.getElementById('couponApplyForm');
+    couponApplyFormElement.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      await couponApply();
+    });
+  });
+
+  async function couponApply() {
+    try {
+        const couponApplyForm = document.getElementById('couponApplyForm');
+        const formData = { couponCode: couponApplyForm.couponCode.value };
+
+        const response = await fetch('/checkout/applyCoupon', {
+            method: 'POST',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
+        });
+
+        const { couponApplied, discountAmount, couponAlreadyUsed } = await response.json();
+
+        if (couponApplied) {
+            const grandTotalElement = document.getElementById('grandTotal');
+            const grandTotal = parseFloat(grandTotalElement.innerHTML.replace('₹', '')) - discountAmount;
+            grandTotalElement.innerHTML = '' + grandTotal.toFixed(2);
+
+            const totalDiscountElement = document.getElementById('totalDiscount');
+            totalDiscountElement.innerHTML = '₹' + discountAmount.toFixed(2);
+
+            await Swal.fire({
+                icon: "success",
+                title: "Coupon has been applied",
+                showConfirmButton: false,
+                timer: 1500,
+            });
+        } else if (couponAlreadyUsed) {
+            await Swal.fire({
+                icon: "error",
+                title: "Coupon already used",
+                text: "Sorry! You have already used this coupon.",
+            });
+        } else {
+            await Swal.fire({
+                icon: "error",
+                title: "Coupon not applicable",
+                text: "Sorry! Your coupon is not applicable.",
+            });
+        }
+    } catch (error) {
+        console.error('Error applying coupon:', error);
+    }
+}
+
+
+
+
+  async function storeDiscountInOrder(orderId, discountAmount) {
+    try {
+        const response = await fetch('/orders/storeDiscount', {
+            method: 'POST',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ orderId, discountAmount }),
+        });
+
+    } catch (error) {
+        console.error('Error storing discount in order:', error);
+    }
+}
+
+</script>

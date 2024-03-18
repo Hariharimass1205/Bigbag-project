@@ -1,5 +1,6 @@
 const userCollection = require("../Model/userModel.js")
 const orderCollection = require("../Model/orderModel.js")
+const walletCollection = require("../Model/walletModel.js")
 const bcrypt = require("bcrypt")
 const nodemailer = require("nodemailer")
 const formatDate = require("../service/dateFormate.js")
@@ -114,12 +115,14 @@ const signupfn = async (req, res) => {
 const optVerify = async (req, res) => {
   const otp = req.session.otp
   if (otp === Number(req.body.otp)) {
-    const userdetails = req.session.userDetail
+    const userdetails = req.session.userInfo
     await userCollection(userdetails).save()
     req.session.userName = userdetails.fname + userdetails.lname
     req.session.email = userdetails.email
     req.session.islogin = true
-    req.session.userInfo = userdetails
+    const userDetail = await userCollection.findOne({email:userdetails.email})
+    await walletCollection.create({userId : userDetail._id })
+    req.session.userInfo = userDetail
     res.redirect("/")
   } else {
     res.render("user/otppage", { invalidotp: "OTP Invalid" })
@@ -248,8 +251,10 @@ const Passresetotp = async (email) => {
 const userProfilefn = async (req, res) => {
   try {
     const currentUser = req.session.userInfo
+    const wallectBalance = await walletCollection({userId:currentUser._id})
+    console.log(wallectBalance)
     const userInfo = await userCollection.findById({ _id: currentUser._id })
-    res.render("user/Profilepage", { userInfo })
+    res.render("user/Profilepage", { userInfo , walletBalance:wallectBalance })
   } catch (error) {
     console.log(error);
   }

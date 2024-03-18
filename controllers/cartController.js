@@ -4,9 +4,7 @@ const userCollection = require("../Model/userModel");
 const cartCollection = require("../Model/cartModel");
 const orderCollection = require("../Model/orderModel");
 const addressCollection = require("../Model/addressModel");  
-
-
-
+const couponCollection = require("../Model/couponModel.js");
 
    const grandTotal = async(req) => {
     try {
@@ -136,7 +134,9 @@ const decQty = async (req, res) => {
     }
   };
 
-  
+
+
+
 
   const getcheckoutpagefn = async (req, res) => {
     try {
@@ -152,6 +152,7 @@ const decQty = async (req, res) => {
         primary:true
       });
       console.log(addressData)
+
       req.session.currentOrder = await orderCollection.create({
         userId: req.session.userInfo._id,
         orderNumber: (await orderCollection.countDocuments()) + 1,
@@ -160,6 +161,8 @@ const decQty = async (req, res) => {
         cartData: await grandTotal(req),
         grandTotalCost: req.session.grandTotal,
       });
+      console.log(req.session.currentOrder)
+      const coupons = await couponCollection.find(); 
       let userCartData = await grandTotal(req);
       req.session.save()
       res.render("user/checkout1", {
@@ -171,6 +174,7 @@ const decQty = async (req, res) => {
         cartData,
         addressData: req.session.address,
         addressData,
+        coupons: coupons 
       });
       }
       
@@ -179,41 +183,9 @@ const decQty = async (req, res) => {
     }
   };
 
-  const orderPlacedEnd = async (req, res) => {
-    try {
-      console.log(req.session.userInfo)
-    let cartData = await cartCollection
-      .find({ userId: req.session.userInfo._id })
-      .populate("productId");
-    // console.log(cartData);
-    console.log("safjkdhf");
-    cartData.map(async (v) => {
-      v.productId.productStock -= v.productQuantity; //reducing from stock qty
-      await v.productId.save();
-      return v;
-    })
-    let orderData= await orderCollection.findOne({ _id: req.session.currentOrder._id})
-    if(orderData.paymentType =='toBeChosen'){
-      orderData.paymentType = 'COD'
-      orderData.save()
-    }
-    let x = await cartCollection.findByIdAndUpdate({ _id: req.session.currentOrder._id}).populate("productId");
-    console.log('StockSold incremented successfully.');
-    console.log("rendering next");
-    res.render("user/checkout2", {
-      signIn: req.session.signIn,
-      user: req.session.user,
-      orderCartData: cartData,
-      orderData: req.session.currentOrder,
-    });
-    //delete product from cart since the order is placed
-    await cartCollection.deleteMany({ userId: req.session.userInfo._id });
-    console.log("deleting finished");
-    } catch (error) {
-      console.log(error)
-    }
-  };
+ 
 
+  
   const orderPlaced = async (req, res) => {
     try {
       if (req.body.razorpay_payment_id) {
@@ -234,8 +206,7 @@ const decQty = async (req, res) => {
         });
         if (walletData.walletBalance >= req.session.grandTotal) {
           walletData.walletBalance -= req.session.grandTotal;
-  
-  
+
           // wallet tranaction data 
           let walletTransaction = {
             transactionDate : new Date(),
@@ -268,7 +239,6 @@ const decQty = async (req, res) => {
             },
           }
         );
-  
         res.json({ success: true });
       }
     } catch (error) {
@@ -276,8 +246,109 @@ const decQty = async (req, res) => {
     }
   };
 
+  const orderPlacedEnd = async (req, res) => {
+    try {
+    let cartData = await cartCollection
+      .find({ userId: req.session.userInfo._id })
+      .populate("productId");
+    // console.log(cartData);
+    cartData.map(async (v) => {
+      v.productId.productStock -= v.productQuantity; //reducing from stock qty
+      await v.productId.save();
+      return v;
+    })
+    console.log('req.session.currentOrder:');
+    console.log(req.session.currentOrder);
+    let orderData = await orderCollection.findOne({ _id: req.session.currentOrder._id})
+    console.log(orderData)
+    if(orderData.paymentType =='toBeChosen'){
+      // orderData.paymentType = 'COD'
+      // orderData.save()
+      await orderCollection.updateOne({ _id: req.session.currentOrder._id}, { $set : { paymentType: 'COD'   }  })
+    }
+    let x = await cartCollection.findByIdAndUpdate({ _id: req.session.currentOrder._id}).populate("productId");
+    console.log('StockSold incremented successfully.');
+    console.log("rendering next");
 
-  module.exports={cartpagefn,addtoCart,decQty,incQty,deleteFromCart,getcheckoutpagefn,orderPlacedEnd,orderPlaced}
+    res.render("user/checkout2", {
+      signIn: req.session.signIn,
+      user: req.session.user,
+      orderCartData: cartData,
+      orderData: req.session.currentOrder,
+    });
+    //delete product from cart since the order is placed
+    await cartCollection.deleteMany({ userId: req.session.userInfo._id });
+    console.log("deleting finished");
+    } catch (error) {
+      console.log(error)
+    }
+  };
+
+  const applyCoupon = async (req, res) => {
+    try {
+      let { couponCode } = req.body;
+      const userId = req.session.userInfo._id;
+      let couponData = await couponCollection.findOne({ couponCode });
+  
+      if (!couponData) {
+        return res.status(501).json({ couponApplied: false });
+      }
+  
+      if (couponData.userId.includes(userId)) {
+        return res.status(501).json({ couponApplied: false, couponAlreadyUsed: true });
+      }
+  
+      let { grandTotal } = req.session;
+      let { minimumPurchase, expiryDate } = couponData;
+      let minimumPurchaseCheck = minimumPurchase < grandTotal;
+      let expiryDateCheck = new Date() < new Date(expiryDate);
+    
+  
+      if (minimumPurchaseCheck && expiryDateCheck) {
+  
+        let { discountPercentage, maximumDiscount } = couponData;
+        let discountAmount =
+          (grandTotal * discountPercentage) / 100 > maximumDiscount
+            ? maximumDiscount
+            : (grandTotal * discountPercentage) / 100;
+  
+        let { currentOrder } = req.session;
+        await orderCollection.findByIdAndUpdate(
+          { _id: currentOrder._id },
+          {
+            $set: { couponApplied: couponData._id },
+            $inc: { grandTotalCost: -discountAmount },
+          }
+        );
+  
+        req.session.grandTotal -= discountAmount;
+  
+        await couponCollection.findByIdAndUpdate({_id: couponData._id}, { $push: { userId: userId } });
+  
+        res.status(202).json({ couponApplied: true, discountAmount });
+      } else {
+        res.status(501).json({ couponApplied: false });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  };
+
+  const storedApplycoupon =  async (req, res) => {
+    try {
+        const { orderId, discountAmount } = req.body;
+        
+        await orderCollection.findByIdAndUpdate(orderId, { totalDiscount: discountAmount });
+        res.sendStatus(200); 
+    } catch (error) {
+        console.error('Error storing discount in order:', error);
+        res.status(500).send('Internal Server Error'); 
+    }
+  };
+  
+
+  module.exports={cartpagefn,addtoCart,decQty,incQty,deleteFromCart,getcheckoutpagefn,orderPlacedEnd,orderPlaced,storedApplycoupon,applyCoupon}
 
 
 

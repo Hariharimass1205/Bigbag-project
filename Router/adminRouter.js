@@ -49,28 +49,50 @@ const {
 }= require('../controllers/orderController.js')
 
 
+const {
+    couponManagement,
+    addCoupon,
+    editCoupon,
+    deleteCoupon
+}= require("../controllers/couponController.js")
+
+const {
+    productOfferManagement,
+    addOffer,
+    editOffer,
+    getCategoryOffer,
+    addCategoryOffer,
+    editCategoryOffer,
+    editCategoryOfferStatus
+}= require("../controllers/offerController.js")
+
+
+// login 
 adminRoute.get('/',loadLogin);
 adminRoute.post('/',verifyLogin);
 adminRoute.get('/adminHome',adminHome)
 adminRoute.get("/logout",adminLogout);
 
 
+//user manage
 adminRoute.get("/userManagement",isAdmin,userListController);
 adminRoute.get("/unblock-user/:id",isAdmin, unblockUserController);
 adminRoute.get("/block-user/:id",isAdmin,blockUserController);
 
 
+
+// category
 adminRoute.get('/categories',isAdmin,categoriesPage)
 adminRoute.get('/addCategories',isAdmin,addCategoriesPage)
 adminRoute.post('/categories/add',isAdmin,addCategory)
-
-
 adminRoute.get('/categories/edit/:id',isAdmin,editCategory);
 adminRoute.post('/editCategories/:id',isAdmin,editCategoriesPage)
 adminRoute.post('/categories/list/:id', isAdmin,listCategory)
 adminRoute.post('/categories/unlist/:id',isAdmin,unlistCategory)
 
 
+
+//product list
 adminRoute.get('/products',isAdmin,productlist)
 adminRoute.get('/addProduct',isAdmin,addProductPage)
 adminRoute.post('/addproduct',upload.any(),addProduct);
@@ -81,12 +103,35 @@ adminRoute.post('/unlist/:id',isAdmin, unListProduct)
 adminRoute.post('/list/:id',isAdmin, listProduct)
 
 
+// order 
 adminRoute.get("/orderManagement",isAdmin, orderManagement);
 adminRoute.get( "/orderManagement/pending/:id",isAdmin,changeStatusPending);
 adminRoute.get("/orderManagement/shipped/:id",isAdmin,changeStatusShipped);
 adminRoute.get("/orderManagement/delivered/:id",isAdmin,changeStatusDelivered);
 adminRoute.get("/orderManagement/return/:id",isAdmin,changeStatusReturn);
 adminRoute.get("/orderManagement/cancelled/:id",isAdmin,changeStatusCancelled);
+
+
+// coupon 
+adminRoute.get("/couponManagement", isAdmin,couponManagement);
+adminRoute.post("/couponManagement/addCoupon",isAdmin,addCoupon);
+adminRoute.put("/couponManagement/editCoupon/:id", isAdmin,editCoupon);
+adminRoute.delete("/couponManagement/deleteCoupon/:id", isAdmin,deleteCoupon);
+
+
+
+// product offer
+adminRoute.get("/productOfferManagement",isAdmin,productOfferManagement);
+adminRoute.post("/productOfferManagement/addOffer",isAdmin,addOffer);
+adminRoute.put("/productOfferManagement/editOffer/:id", isAdmin,editOffer);
+
+
+// category offer
+adminRoute.get("/category-offer-list", isAdmin,getCategoryOffer);
+adminRoute.post("/add-category-offer", isAdmin,addCategoryOffer);
+adminRoute.put("/edit-category-offer", isAdmin,editCategoryOffer);
+adminRoute.get("/categoryoffer-status/:id", isAdmin,editCategoryOfferStatus);
+
 
 //Main userRouter connect with Main page for connection
 module.exports = adminRoute

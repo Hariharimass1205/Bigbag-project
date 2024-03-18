@@ -147,6 +147,16 @@
                         <div class="col-12">
                           <div class="btn-group me-0" role="group" aria-label="...">
                             <a href="/profileEdit" class="fas fa-marker-alt"><i class="fa fa-user" aria-hidden="true"></i>EDIT PROFILE</a>
+                            <div style="display: flex;">
+                          <div id="walletBalance">
+                            <button type="button" class="btn btn-success">Wallet Balance</button>
+                          </div>
+                          <% if(walletBalance){  %>
+                          <div id="walletBalance">
+                            <button type="button" class="btn btn-success"> $ <%= walletBalance.walletBalance %></button>
+                         </div>
+                        </div>
+                        <% } %>
                           </div>
                         </div>
                       </div>
@@ -168,6 +178,18 @@
 			var year = d.getFullYear();
 			document.getElementById("copy-year").innerHTML = year;
 		</script>
+    <style>
+      #walletBalance {
+          background-color: rgb(224, 224, 224);
+          justify-content: center;
+          font-size: larger;
+          font-weight: bolder;
+          border: 2px solid #b7b8b9; /* Blue border */
+          padding: 10px; /* Add some padding for better appearance */
+          width: fit-content;
+          margin: 30px;
+      }
+  </style>
 
 		<!-- LOGIN MODAL -->
 		
