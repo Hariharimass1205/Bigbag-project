@@ -66,6 +66,13 @@ const signupPagefn = (req, res) => {
   try {
     req.session.emailExist;
     req.session.userNumber;
+
+    console.log(`======req.query=====`)
+    console.log(req.query)
+    req.session.referalCodeuseage = req.query
+
+    
+
     res.render("user/signup", { emailExist: req.session.emailExist, userNumber: req.session.userNumber })
     req.session.emailExist = false
     req.session.userNumber = false
@@ -116,7 +123,20 @@ const optVerify = async (req, res) => {
   const otp = req.session.otp
   if (otp === Number(req.body.otp)) {
     const userdetails = req.session.userInfo
-    await userCollection(userdetails).save()
+    const ReferalCode = Math.random().toString(36).substring(2,9);//referal code
+    console.log(userdetails)
+    const {fname,lname,email,Password,confirmPass,Phone} = userdetails
+    await userCollection({fname,lname,email,Password,confirmPass,Phone,ReferalCode}).save()
+    if(req.session.referalCodeuseage)
+    {
+      console.log(req.session)
+      console.log(`=================`)
+      const referalUser = await userCollection.findOne({ReferalCode:req.session?.referalCodeuseage?.referralCode})
+      console.log(referalUser)
+      await walletCollection.updateOne({userId:referalUser._id},{$inc:{walletBalance:500}})
+      console.log(req.session?.referalCodeuseage)
+      console.log(req.session?.referalCodeuseage?.referralCode)
+    }
     req.session.userName = userdetails.fname + userdetails.lname
     req.session.email = userdetails.email
     req.session.islogin = true

@@ -106,9 +106,6 @@ const applyCategoryOffer= require("../service/applyCategoryOffer").applyCategory
     try {
       const categories = await categoryModel.find();
       const offers = await categoryOfferModel.find().populate("category");
-      console.log("offers");
-      console.log(offers)
-      console.log(JSON.stringify(offers));
       applyCategoryOffer();
       res.render("admin/categoryOfferList", { categories, offers });
     } catch (error) {
@@ -121,9 +118,7 @@ const applyCategoryOffer= require("../service/applyCategoryOffer").applyCategory
   const addCategoryOffer =  async (req, res) => {
   try {
     const { category, offerPercentage, startDate, endDate } = req.body;
-
     const offerExist = await categoryOfferModel.findOne({ category });
-
     if (offerExist) {
       return res.status(500).send({ exist: true });
     }
