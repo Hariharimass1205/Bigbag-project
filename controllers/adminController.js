@@ -22,12 +22,8 @@ const loadLogin = async (req, res) => {
     try {
       const { email, password } = req.body;
       const userData = await userdata.findOne({ email });
-      console.log('password:');
-      console.log(password)
-      console.log('userData:');
-      console.log(userData)
       if (userData) {
-        const passwordMatch = bcrypt.compare(password, userData.Password);
+        const passwordMatch = await bcrypt.compare(password, userData.Password);
         if (passwordMatch) {
           req.session.user_id = userData._id;
           req.session.isLoggedin = true;

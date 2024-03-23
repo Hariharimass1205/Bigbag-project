@@ -5,14 +5,15 @@ const cartCollection = require("../Model/cartModel");
 const orderCollection = require("../Model/orderModel");
 const addressCollection = require("../Model/addressModel");  
 const couponCollection = require("../Model/couponModel.js");
+const walletCollection = require("../Model/walletModel.js")
 
-   const grandTotal = async(req) => {
+
+  const grandTotal = async(req)=>{
     try {
-      console.log("session" + req.session.userInfo);
       let userCartData = await cartCollection
         .find({ userId: req.session.userInfo._id })
         .populate("productId");
-      console.log(Array.isArray(userCartData));
+        console.log(userCartData)
       let grandTotal = 0;
       for (const v of userCartData) {
         grandTotal += v.productId.productPrice * v.productQuantity;
@@ -28,20 +29,21 @@ const couponCollection = require("../Model/couponModel.js");
       userCartData = await cartCollection
         .find({ userId: req.session.userInfo._id })
         .populate("productId");
-        req.session.grandTotal = grandTotal;
-        console.log( `jre,mmerrmiorcmurun${userCartData}`)
-        return JSON.parse(JSON.stringify(userCartData));
-      } catch (error) {
+      req.session.grandTotal = grandTotal;
+  
+      return JSON.parse(JSON.stringify(userCartData));
+    } catch (error) {
       console.log(error);
     }
   }
-
 
 
   const cartpagefn = async (req, res) => {
     try {
       const userInfo = req.session?.userInfo
       let userCartData = await grandTotal(req);
+
+      console.log(userCartData)
       let empty;
       userCartData == 0 ? (empty = true) : (empty = false);
       res.render("user/cartpage", {
@@ -202,7 +204,7 @@ const decQty = async (req, res) => {
         res.redirect("/checkout/orderPlacedEnd");
       } else if (req.body.walletPayment) {
         const walletData = await walletCollection.findOne({
-          userId : req.session.currentUser._id,
+          userId : req.session.userInfo._id,
         });
         if (walletData.walletBalance >= req.session.grandTotal) {
           walletData.walletBalance -= req.session.grandTotal;

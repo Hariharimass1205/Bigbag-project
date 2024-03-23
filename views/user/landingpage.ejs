@@ -129,26 +129,18 @@
                   
                   
                   <%  if (userName ){  %>
-                   <li><p style="color:rgb(194, 193, 193); padding-top: 13px;font-size: small ;"> Welcome <%=userName %> </p></span>
+                   <li>
+                    <p style="color:rgb(194, 193, 193); padding-top: 13px;font-size: small ;"> Welcome <%=userName %> </p>
+                  </span>
                   </li>
-                  <a style=" color:rgb(194, 193, 193);font-size:small;" href="/logout">LOGOUT</a>
+                  <li><a style=" color:rgb(194, 193, 193);font-size:small;  margin-top: 4.5px;" href="/logout">LOGOUT</a></li>
                   <% }  else { %>
                   <li class="account-login">
                     <span><a href='/login'>Log in</a><small>or
                   </small><a  href='/signup'>Create an account</a></span>
                  </li>
                  <% } %>
-                  <li class="searchBox">
-                    <a class="text-white" href="javascript:void(0)"><i class="fas fa-search"></i></a>
-                    <ul class="dropdown-menu dropdown-menu-right">
-                      <li>
-                        <form class="input-group">
-                          <input type="text" class="form-control" placeholder="Search…" aria-describedby="basic-addon2" required>
-                          <button type="submit" class="input-group-addon">Submit</button>
-                        </form>
-                      </li>
-                    </ul>
-                  </li>
+                 
                   </li>
                 </ul>
               </div>

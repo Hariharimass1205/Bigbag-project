@@ -35,6 +35,12 @@
                 <li>
                   <a href="javascript:void(0)">shop</a>
                 </li>
+              
+                      
+                        
+                    </li>
+                  </ul>
+                </li>
               </ol>
             </div>
           </div>
@@ -45,6 +51,16 @@
       <section class="mainContent clearfix productsContent">
         <div class="container">
           <div class="row">
+            <div class="header-search">
+              <a href="#" class="search-toggle" role="button"><i class="icon-search"></i></a>
+              <form action="/search" method="Post">
+                  <div class="header-search-wrapper">
+                      <label for="q" class="sr-only">Search</label>
+                      <input type="search" class="form-control" name="search" id="search"
+                          placeholder="Search here..." required>
+                  </div><!-- End .header-search-wrapper -->
+              </form>
+          </div>
             <div class="col-lg-3 col-md-4 sideBar">
               <div class="accordion filter-accordion" id="accordionExample">
                 <div class="accordion-item panel">
@@ -90,7 +106,7 @@
                               </li>
                               <li>
                                 <div class="" role="tab" id="heading4">
-                                  <a href="/filterCategory?categoriesName=All" >All Categories </a>
+                                  <a href="/filterCategory?categoriesName=All" >Reset filter </a>
                                 </div>
                                 <li><a href="javascript:void(0)"></a></li>
                                 <li><a href="javascript:void(0)"></a></li>
@@ -125,7 +141,8 @@
           <% productData.forEach((product, i)=> { %>
                 <div class="item" >
                     <a  href="/productDetails/<%= product._id %>"><img  data-src="/upload/<%= product.productImage1 %>" src="/upload/<%= product.productImage1 %>" alt="image"   class="img-responsive" style="    width: 150px; padding-bottom: 10px;
-                    height: 200px; overflow: hidden;"></a>
+                    height: 200px; overflow: hidden;">
+                    </a>
                     <div style=" display: flex;
                     flex-direction: column;
                     flex-wrap: nowrap;
@@ -136,11 +153,9 @@
                     </div>
                 </div>
                 <% }); %>
-                
                 <div class="d-flex justify-content-center py-3">
                   <nav aria-label="Page navigation example">
                     <ul class="pagination">
-                     
                       <% for( let i = 0; i < count/limit; i++ ) { %>
                       <li class="page-item">
                         <a class="page-link" href="/productCategory?page=<%=i+1 %>"><%= i+1 %></a>

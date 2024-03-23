@@ -149,14 +149,18 @@
                             <a href="/profileEdit" class="fas fa-marker-alt"><i class="fa fa-user" aria-hidden="true"></i>EDIT PROFILE</a>
                             <div style="display: flex;">
                           <div id="walletBalance">
-                            <button type="button" class="btn btn-success">Wallet Balance</button>
+                            <button type="button" class="btn btn-primary">Wallet Balance</button>
                           </div>
                           <% if(walletBalance){  %>
                           <div id="walletBalance">
-                            <button type="button" class="btn btn-success"> $ <%= walletBalance.walletBalance %></button>
+                            <button type="button" class="btn btn-primary"> $ <%= walletBalance.walletBalance %></button>
                          </div>
                         </div>
-                        <% } %>
+                        <% } else {%>
+                          <div id="walletBalance">
+                            <button type="button" class="btn btn-primary"> $ 0</button>
+                         </div>
+                          <% } %>
                           </div>
                         </div>
                       </div>
@@ -180,11 +184,11 @@
 		</script>
     <style>
       #walletBalance {
-          background-color: rgb(224, 224, 224);
+          
           justify-content: center;
           font-size: larger;
           font-weight: bolder;
-          border: 2px solid #b7b8b9; /* Blue border */
+         
           padding: 10px; /* Add some padding for better appearance */
           width: fit-content;
           margin: 30px;

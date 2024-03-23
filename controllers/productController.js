@@ -141,7 +141,7 @@ const deleteProduct = async (req,res)=>{
   const sortPricefn = async(req,res)=>{
     try{
         if(req.params.id == "lowToHigh"){
-            let data = req.session.categoriesFilter
+            let data = req.session.shopProductData
             let i=0
             let temp;
             let j;
@@ -159,12 +159,12 @@ const deleteProduct = async (req,res)=>{
                 }
                 i++
             }
-            req.session.count = (req.session.categoriesFilter).length
+            req.session.count = (req.session.shopProductData).length
             req.session.save()
             res.redirect("/productCategory")
         }else if(req.params.id == "highToLow"){
-            let data = req.session.categoriesFilter
-            console.log(req.session.categoriesFilter)
+            let data = req.session.shopProductData
+            console.log(req.session.shopProductData)
             let i=0
             let temp;
             let j;
@@ -182,7 +182,7 @@ const deleteProduct = async (req,res)=>{
                 }
                 i++
             }
-            req.session.categoriesFilter = data
+            req.session.shopProductData = data
             req.session.count = data.length
             req.session.save()
             res.redirect("/productCategory")
@@ -197,12 +197,15 @@ const deleteProduct = async (req,res)=>{
   const editProduct = async (req, res) => {
     console.log("edit");
     try {
-      let existingProduct = await productCollection.findOne({
-        productName: { $regex: new RegExp(req.body.productName, "i") },
+      console.log(req.body.productName)
+      let existingProduct = await productCollection.find({
+        productName: req.body.productName
       });
-      if (!existingProduct || existingProduct._id == req.params.id) {
-        console.log("edit1");
 
+      console.log(existingProduct);
+      console.log(req.params.id)
+      if (existingProduct.length == 0 || (existingProduct[0]._id == req.params.id && existingProduct.length ==1)) {
+        console.log("edit1");
         const updateFields = {
           $set: {
             productName: req.body.productName,
@@ -211,7 +214,6 @@ const deleteProduct = async (req,res)=>{
             productStock: req.body.productStock,
           },
         };
-  
         if (req.files[0]) {
           updateFields.$set.productImage1 = req.files[0].filename;
         }
@@ -223,6 +225,7 @@ const deleteProduct = async (req,res)=>{
         if (req.files[2]) {
           updateFields.$set.productImage3 = req.files[2].filename;
         }
+
         await productCollection.findOneAndUpdate(
           { _id: req.params.id },
           updateFields
@@ -238,6 +241,28 @@ const deleteProduct = async (req,res)=>{
       console.error(error);
     }
   };
+
+
+  const search = async (req, res) => {
+    try {
+
+      console.log(req.body);
+      const searchQuery  = req.body.search // Adjust according to the name attribute of your form input
+      console.log(searchQuery)
+      const searchProduct = await productCollection.find({
+        $or: [
+          { productName: { $regex: searchQuery, $options: "i" } },
+          { parentCategory: { $regex: searchQuery, $options: "i" } },
+        ],    
+      }) 
+      req.session.shopProductData = searchProduct;
+      res.redirect("back");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
   
   module.exports = 
   {
@@ -250,49 +275,66 @@ const deleteProduct = async (req,res)=>{
     listProduct,
     deleteProduct,
     sortPricefn,
+    search,
 
 
     
   // //    user product process fn below
 
-
    productCategoryfn :async (req, res) => {
-    req.session.userInfo
-    console.log(req.session.userInfo)
     try {
       let page = Number(req.query.page) || 1;
       let limit = 8;
       let skip = (page - 1) * limit;
+      let productData =
+        req.session?.shopProductData?.slice(skip, limit*page )
+         ||
+        (await productCollection
+          .find({ isListed: true })
+          .skip(skip)
+          .limit(limit));
   
+      if (req.session.user) {
+        cartData = await cartCollection
+          .find({ userId: req.session?.currentUser?._id })
+          .populate("productId");
+      } else {
+        cartData = [];
+      }
       let categoryData = await categoryCollection.find({ isListed: true });
-      let productData = await productCollection
-        .find({ isListed: true }) 
-        .skip(skip)
-        .limit(limit)
-        productData = await  req.session.categoriesFilter ? req.session.categoriesFilter : productData;
+      // let productData = await productCollection
+      //   .find({ isListed: true })
+      //   .skip(skip)
+      //   .limit(limit)
+      let count;
+      if (req.session && req.session.shopProductData) {
+        count = req.session.shopProductData.length;
+      } else {
+        count = await productCollection.countDocuments({ isListed: true });
+      }
   
-        req.session.categoriesFilter = productData
-        req.session.save()
-  
-      let count = await productCollection.countDocuments({ isListed: true });
       let totalPages = Math.ceil(count / limit);
       let totalPagesArray = new Array(totalPages).fill(null);
+      console.log(req.session.button);
       res.render("user/productsCategory", {
         categoryData,
         productData,
-        currentUser: req.session.userInfo,
+        currentUser: req.session.currentUser,
         user: req.session.user,
         count,
         limit,
         totalPagesArray,
         currentPage: page,
-        selectedFilter: req.session.selectedFilter,
+        selectedFilter: req.session.button,
+        cartData,
       });
-    } catch (error) {   
+  
+    } catch (error) {
       console.error("Error fetching product data:", error);
       res.status(500).send("Internal Server Error");
     }
   },
+
 
 
       ProductDetailsfn : async (req, res) => {

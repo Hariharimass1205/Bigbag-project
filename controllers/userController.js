@@ -251,10 +251,11 @@ const Passresetotp = async (email) => {
 const userProfilefn = async (req, res) => {
   try {
     const currentUser = req.session.userInfo
-    const wallectBalance = await walletCollection({userId:currentUser._id})
-    console.log(wallectBalance)
+    const walletBalance = await walletCollection.findOne({userId:currentUser._id})
+    console.log("profile innn")
+    console.log(walletBalance)
     const userInfo = await userCollection.findById({ _id: currentUser._id })
-    res.render("user/Profilepage", { userInfo , walletBalance:wallectBalance })
+    res.render("user/Profilepage", { userInfo , walletBalance:walletBalance })
   } catch (error) {
     console.log(error);
   }

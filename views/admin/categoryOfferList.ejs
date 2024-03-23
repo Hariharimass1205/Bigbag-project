@@ -124,7 +124,7 @@
               <% offers.forEach((offer,i) => { %>
               <tr>
                 <td><%= i+1 %></td>
-                <td><%= offer.category.categoryName %></td>
+                <td><%= offer.category?.categoryName %></td>
                 <td><%= offer.offerPercentage %></td>
                 <td><%= offer.startDate.toLocaleString() %></td>
                 <td><%= offer.endDate.toLocaleString() %></td>

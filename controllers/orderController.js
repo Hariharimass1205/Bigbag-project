@@ -149,12 +149,13 @@ const singleorderfn =  async (req, res) => {
   const cancelOrder = async (req, res) => {
   try {
     const { cancelReason } = req.body;
-    console.log("hhhhhh", cancelReason);
+    console.log("hhhhhh");
     const orderData = await orderCollection.findOne({ _id: req.params.id });
     await orderCollection.findByIdAndUpdate(
       { _id: req.params.id },
       { $set: { orderStatus: "Cancelled", cancelReason } }
     );
+    console.log(orderData.grandTotalCost)
     let walletTransaction = {
       transactionDate: new Date(),
       transactionAmount: orderData.grandTotalCost,

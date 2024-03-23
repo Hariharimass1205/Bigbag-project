@@ -138,13 +138,13 @@ const categoriesPage = async (req, res) => {
   const categoryFilterfn = async (req,res)=>{
     try{
       if(req.query.categoriesName =="All"){
-        req.session.categoriesFilter = await productCollection.find({isListed:true})
-        req.session.count = (req.session.categoriesFilter).length 
+        req.session.shopProductData = await productCollection.find({isListed:true})
+        req.session.count = (req.session.shopProductData).length 
         req.session.save()
         res.redirect("/productCategory")
       }else{
-        req.session.categoriesFilter = await productCollection.find({isListed:true,parentCategory:req.query.categoriesName})
-        req.session.count = (req.session.categoriesFilter).length 
+        req.session.shopProductData = await productCollection.find({isListed:true,parentCategory:req.query.categoriesName})
+        req.session.count = (req.session.shopProductData).length 
         req.session.save()
         res.redirect("/productCategory")
       }

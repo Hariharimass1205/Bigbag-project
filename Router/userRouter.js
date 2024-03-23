@@ -28,7 +28,8 @@ const {
 const {
     sortPricefn,
     productCategoryfn,
-    ProductDetailsfn
+    ProductDetailsfn,
+    search,
 }= require("../controllers/productController.js")
 
 const { 
@@ -97,6 +98,7 @@ userRouter.get('/passchange', isUser,isBlocked,passChange)
 userRouter.patch('/changePassword',isUser,isBlocked,PostpassChange)
 
 
+//address
 userRouter.get("/address",isUser,isBlocked,userAddressfn)
 userRouter.get("/addressAdd",isUser,isBlocked,addAddressfn)
 userRouter.post('/saveAddress',isBlocked,saveaddressfn)
@@ -105,8 +107,7 @@ userRouter.post('/editAddress/:id',isBlocked, isUser,postEditAddressfn)
 userRouter.get('/deleteAddress/:id',isUser,isBlocked,deleteAddressfn)
 userRouter.get("/primary/:id",isBlocked,PrimaryCheckfn)
 userRouter.get("/notPrimary/:id",isBlocked,notPrimaryCheckfn)
-userRouter.get("/orders",isUser,allordersfn)
-userRouter.get("/orderStatus/:id",isBlocked,singleorderfn)
+
 
 
 
@@ -126,6 +127,9 @@ userRouter.get("/productCategory", isBlocked,isUser,productCategoryfn)
 userRouter.get("/filterCategory",isBlocked,categoryFilterfn)
 userRouter.get("/sortLow/:id",isBlocked,sortPricefn)
 userRouter.get("/productDetails/:id",isBlocked,ProductDetailsfn)
+userRouter.post("/search",isUser,isBlocked,search)
+
+
 
 // cart
 userRouter.get("/cart/:id",isBlocked,cartpagefn)
@@ -136,7 +140,7 @@ userRouter.put('/cart/incQty/:id',isBlocked,incQty)
 userRouter.delete('/cart/delete/:id',isBlocked,deleteFromCart);
 userRouter.get("/checkout",isBlocked,getcheckoutpagefn)
 userRouter.post("/checkout/applyCoupon",isBlocked,applyCoupon);
-userRouter.post("/orders/storeDiscount",isBlocked,storedApplycoupon);
+userRouter.post("/orders/storeDiscount",isBlocked,storedApplycoupon);       
 
 
 //wishlist
@@ -146,6 +150,9 @@ userRouter.delete('/wishlist/delete/:id', isBlocked,isUser,removeFromWishList)
 
 
 
+//order
+userRouter.get("/orders",isUser,allordersfn)
+userRouter.get("/orderStatus/:id",isBlocked,singleorderfn)
 userRouter.post("/razorpayOrderCreated:id",isBlocked,isUser,genOrder)
 userRouter.post('/checkout/orderPlaced',isBlocked,isUser,orderPlaced);
 userRouter.all('/confirmOrder',isBlocked,isUser,orderPlacedEnd)

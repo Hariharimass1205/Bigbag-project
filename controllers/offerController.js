@@ -8,7 +8,6 @@ const applyProductOffers =
   require("../service/applyProductOffers").applyProductOffer;
 const applyCategoryOffer= require("../service/applyCategoryOffer").applyCategoryOffer;
 
-
    const  productOfferManagement = async (req, res) => {
     try {
       // updating the currentStatus field by checking with the current date
@@ -24,7 +23,6 @@ const applyCategoryOffer= require("../service/applyCategoryOffer").applyCategory
           }
         );
       });
-
       //sending the formatted date to the page
       productOfferData = productOfferData.map((v) => {
         v.startDateFormatted = formatDate(v.startDate, "YYYY-MM-DD");
@@ -33,12 +31,10 @@ const applyCategoryOffer= require("../service/applyCategoryOffer").applyCategory
       });
       let productData = await productCollection.find();
       let categoryData = await categoryModel.find();
-
       res.render("admin/productOfferList", {
         productData,
         productOfferData,
         categoryData,
-
       });
     } catch (error) {
       console.error(error);
@@ -50,9 +46,7 @@ const applyCategoryOffer= require("../service/applyCategoryOffer").applyCategory
       //check if the product already has an offer applied
       let { productName } = req.body;
       let existingOffer = await productOfferCollection.findOne({ productName });
-
       if (!existingOffer) {
-
         //if offer for that particular product doesn't exist:
         let productData = await productCollection.findOne({ productName });
         let { productOfferPercentage, startDate, endDate } = req.body;
@@ -105,79 +99,84 @@ const applyCategoryOffer= require("../service/applyCategoryOffer").applyCategory
       console.error(error);
     }
   }
-  const  getCategoryOffer = async (req, res) => {
+
+
+
+  const  getCategoryOffer = async (req, res) =>{
     try {
       const categories = await categoryModel.find();
       const offers = await categoryOfferModel.find().populate("category");
+      console.log("offers");
+      console.log(offers)
+      console.log(JSON.stringify(offers));
       applyCategoryOffer();
       res.render("admin/categoryOfferList", { categories, offers });
     } catch (error) {
       console.log(error);
     }
   }
-  
+
+
+
   const addCategoryOffer =  async (req, res) => {
-    try {
-      const { category, offerPercentage, startDate, endDate } = req.body;
-  
-      const offerExis= await categoryOfferModel.findOne({ category });
-  
-      if (offerExist) {
-        return res.status(500).send({ exist: true });
-      }
-  
-      const offer = await new categoryOfferModel({
-        category,
-        offerPercentage,
-        startDate,
-        endDate,
-      }).save();
-  
-      return res.status(200).send({ success: true });
-    } catch (error) {
-      console.log(error);
-      return res.status(500).send({ success: false });
+  try {
+    const { category, offerPercentage, startDate, endDate } = req.body;
+
+    const offerExist = await categoryOfferModel.findOne({ category });
+
+    if (offerExist) {
+      return res.status(500).send({ exist: true });
     }
+    const offer = await new categoryOfferModel({
+      category,
+      offerPercentage,
+      startDate,
+      endDate,
+    }).save();
+    return res.status(200).send({ success: true });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ success: false });
   }
-  
-  const editCategoryOffer = async (req, res) => {
-    try {
-      const { id, offerPercentage, startDate, endDate } = req.body;
-  
-      const offer = await categoryOfferModel.findByIdAndUpdate(id, {
-        offerPercentage,
-        startDate,
-        endDate,
+}
+
+
+
+const editCategoryOffer = async (req, res) => {
+  try {
+    const { id, offerPercentage, startDate, endDate } = req.body;
+
+    const offer = await categoryOfferModel.findByIdAndUpdate(id, {
+      offerPercentage,
+      startDate,
+      endDate,
+    });
+    return res.status(200).send({ success: true });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ success: false });
+  }
+}
+
+
+
+  const editCategoryOfferStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const offer = await categoryOfferModel.findOne({ _id: id });
+    if (offer.isAvailable) {
+      await categoryOfferModel.findByIdAndUpdate(id, {
+        isAvailable: false,
       });
-  
-      return res.status(200).send({ success: true });
-    } catch (error) {
-      console.log(error);
-      return res.status(500).send({ success: false });
+    } else {
+      await categoryOfferModel.findByIdAndUpdate(id, {
+        isAvailable: true,
+      });
     }
+    res.redirect("/category-offer-list");
+  } catch (error) {
+    console.log(error);
   }
-
-
-  const editCategoryOfferStatus =  async (req, res) => {
-    try {
-      const { id } = req.params;
-      const offer = await categoryOfferModel.findOne({ _id: id });
-      if (offer.isAvailable) {
-        await categoryOfferModel.findByIdAndUpdate(id, {
-          isAvailable: false,
-        });
-      } else {
-        await categoryOfferModel.findByIdAndUpdate(id, {
-          isAvailable: true,
-        });
-      }
-      res.redirect("/category-offer-list");
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-
-
+}
 
   module.exports={ productOfferManagement,addOffer,editOffer,getCategoryOffer,addCategoryOffer,editCategoryOfferStatus,editCategoryOffer}
