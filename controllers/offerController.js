@@ -7,9 +7,10 @@ const formatDate = require("../service/dateFormate");
 const applyProductOffers =
   require("../service/applyProductOffers").applyProductOffer;
 const applyCategoryOffer= require("../service/applyCategoryOffer").applyCategoryOffer;
-
    const  productOfferManagement = async (req, res) => {
     try {
+
+      console.log(` req reached productOfferManagement`)
       // updating the currentStatus field by checking with the current date
       let productOfferData = await productOfferCollection.find();
       productOfferData.forEach(async (v) => {
@@ -29,8 +30,9 @@ const applyCategoryOffer= require("../service/applyCategoryOffer").applyCategory
         v.endDateFormatted = formatDate(v.endDate, "YYYY-MM-DD");
         return v;
       });
-      let productData = await productCollection.find();
-      let categoryData = await categoryModel.find();
+      
+      let productData = await productCollection.find({isListed:true});
+      let categoryData = await categoryModel.find({isListed:true});
       res.render("admin/productOfferList", {
         productData,
         productOfferData,
@@ -45,10 +47,14 @@ const applyCategoryOffer= require("../service/applyCategoryOffer").applyCategory
     try {
       //check if the product already has an offer applied
       let { productName } = req.body;
+      console.log(req.body);
       let existingOffer = await productOfferCollection.findOne({ productName });
       if (!existingOffer) {
         //if offer for that particular product doesn't exist:
-        let productData = await productCollection.findOne({ productName });
+        let productData = await productCollection.findOne({productName });
+        console.log('productData:');
+        console.log(productData);
+
         let { productOfferPercentage, startDate, endDate } = req.body;
         await productOfferCollection.insertMany([
           {
@@ -73,10 +79,11 @@ const applyCategoryOffer= require("../service/applyCategoryOffer").applyCategory
   const editOffer = async (req, res) => {
     try {
       let { productName } = req.body;
+      console.log(req.body)
       let existingOffer = await productOfferCollection.findOne({
         productName: { $regex: new RegExp(req.body.productName, "i") },
       });
-
+      console.log(`step 2`)
       if (!existingOffer || existingOffer._id == req.params.id) {
         let { discountPercentage, startDate, expiryDate } =
           req.body;
@@ -86,12 +93,16 @@ const applyCategoryOffer= require("../service/applyCategoryOffer").applyCategory
           startDate: new Date(startDate),
           endDate:new Date(expiryDate),
         };
+        console.log(`step 3`)
         const hhh=await productOfferCollection.findByIdAndUpdate(
           req.params.id,
           updateFields
         );
+        console.log(`req success`)
         await applyProductOffers("editOffer");
-        res.json({ success: true });
+        console.log(`sucess full`)
+        res.status(200).send({success:true})
+        // res.json({ success: true });
       } else {
         res.json({ success: false });
       }

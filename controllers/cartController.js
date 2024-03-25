@@ -60,6 +60,7 @@ const walletCollection = require("../Model/walletModel.js")
 
 
   const addtoCart = async (req, res) => {
+    console.log(req.session.userInfo)
     try {
       let existingProduct = null;
       existingProduct = await cartCollection.findOne({

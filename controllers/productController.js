@@ -140,13 +140,14 @@ const deleteProduct = async (req,res)=>{
 
   const sortPricefn = async(req,res)=>{
     try{
+      const searchProduct = await productCollection.find({})
+      req.session.shopProductData = searchProduct
         if(req.params.id == "lowToHigh"){
-            let data = req.session.shopProductData
+            let data = req.session.shopProductData 
             let i=0
             let temp;
             let j;
-             while(i<data.length)
-            {
+             while(i<data.length){
                 j=i+1
                 while(j<data.length){
                     if(data[i].productPrice>data[j].productPrice)
@@ -255,6 +256,7 @@ const deleteProduct = async (req,res)=>{
           { parentCategory: { $regex: searchQuery, $options: "i" } },
         ],    
       }) 
+
       req.session.shopProductData = searchProduct;
       res.redirect("back");
     } catch (error) {

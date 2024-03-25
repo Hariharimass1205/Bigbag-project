@@ -34,10 +34,7 @@
                 </li>
                 <li>
                   <a href="javascript:void(0)">shop</a>
-                </li>
-              
-                      
-                        
+                </li>   
                     </li>
                   </ul>
                 </li>
@@ -122,7 +119,6 @@
                             <li><a href="javascript:void(0)"></a></li>
                             <li><a href="/sortLow/lowToHigh">low-High</a></li>
                             <li><a href="javascript:void(0)"></a></li>
-                  
                             <li><a href="javascript:void(0)"></a></li>
                             <li><a href="/sortLow/highToLow">High-Low</a></li>
                             <li><a href="javascript:void(0)"></a></li>
@@ -149,7 +145,15 @@
                     justify-content: center;
                     align-items: center;">
                       <a href="/productDetails/<%= product._id %>"><h5 style="padding-bottom: 10px;"><%= product.productName %></h5></a>
+                    
+
+                       <% if(product.priceBeforeOffer) {%>
                       <h4 style="padding-bottom: 10px;">$<%= product.productPrice %></h4>
+                                                       <s><%=product.priceBeforeOffer %></s>
+                        <% }else{ %>
+
+                          <h4><%= product.productPrice %></h4>
+                          <% } %>
                     </div>
                 </div>
                 <% }); %>

@@ -66,6 +66,14 @@ const {
     editCategoryOfferStatus
 }= require("../controllers/offerController.js")
 
+const {
+    salesReport,
+    salesReportFilter,
+    salesReportFilterCustom,
+    salesReportDownloadPDF,
+    salesReportDownload,
+}= require("../controllers/salesReportController.js")
+
 
 // login 
 adminRoute.get('/',loadLogin);
@@ -131,6 +139,14 @@ adminRoute.get("/category-offer-list", isAdmin,getCategoryOffer);
 adminRoute.post("/add-category-offer", isAdmin,addCategoryOffer);
 adminRoute.put("/edit-category-offer", isAdmin,editCategoryOffer);
 adminRoute.get("/categoryoffer-status/:id", isAdmin,editCategoryOfferStatus);
+
+
+//salesreport
+adminRoute.get("/salesReport", isAdmin,salesReport);
+adminRoute.post("/salesReport/filter", isAdmin,salesReportFilter);
+adminRoute.post('/salesReport/filterCustom',isAdmin,salesReportFilterCustom)
+adminRoute.get('/salesReport/download/pdf',isAdmin,salesReportDownloadPDF)
+adminRoute.get("/salesReport/download/xlsx",isAdmin,salesReportDownload);
 
 
 //Main userRouter connect with Main page for connection

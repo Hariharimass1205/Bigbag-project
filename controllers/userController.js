@@ -129,13 +129,9 @@ const optVerify = async (req, res) => {
     await userCollection({fname,lname,email,Password,confirmPass,Phone,ReferalCode}).save()
     if(req.session.referalCodeuseage)
     {
-      console.log(req.session)
-      console.log(`=================`)
       const referalUser = await userCollection.findOne({ReferalCode:req.session?.referalCodeuseage?.referralCode})
       console.log(referalUser)
       await walletCollection.updateOne({userId:referalUser._id},{$inc:{walletBalance:500}})
-      console.log(req.session?.referalCodeuseage)
-      console.log(req.session?.referalCodeuseage?.referralCode)
     }
     req.session.userName = userdetails.fname + userdetails.lname
     req.session.email = userdetails.email

@@ -5,6 +5,7 @@ const productOfferCollection = require("../Model/productOfferModel");
 module.exports = {
   applyProductOffer: async (from) => {
     try {
+      console.log(` req applyProductOffer `)
       // updating the currentStatus field of productOfferCollection by checking with the current date
       let productOfferData = await productOfferCollection.find();
       productOfferData.forEach(async (v) => {
@@ -39,6 +40,8 @@ module.exports = {
           offerExistsAndInactiveFn(v, from);
         }
       });
+
+      console.log(`step success`)
     } catch (error) {
       console.error(error);
     }
